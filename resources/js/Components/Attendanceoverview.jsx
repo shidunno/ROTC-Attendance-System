@@ -6,6 +6,7 @@ import { router, usePage } from '@inertiajs/react';
 const COLORS = ['#16a34a', '#f59e0b', '#dc2626', '#3b82f6'];
 
 export default function Attendanceoverview({ role = 'leader', attendanceData: initialAttendanceData = [] }) {
+    console.log("Received attendanceData from controller:", initialAttendanceData);
     const [attendanceData, setAttendanceData] = useState(
         initialAttendanceData.length > 0 ? initialAttendanceData : [
             { status: 'Present', count: 45 },

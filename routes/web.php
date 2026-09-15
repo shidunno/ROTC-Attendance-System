@@ -68,7 +68,7 @@ Route::get('/Dashboard', function() {
         ->whereDate('date', $today)
         ->get()
         ->groupBy(function ($item) {
-            return $item->user->platoon ?? 'Unknown Platoon';
+            return $item->user->platoon?->number ?? 'Unknown Platoon';
         });
 
     $platoonData = [];

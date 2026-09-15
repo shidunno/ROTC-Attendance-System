@@ -1,0 +1,155 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\AnnouncementController;
+use App\Models\Announcement;
+use App\Http\Controllers\AttendanceController;
+
+Route::get('/', function () { 
+    return Inertia::render('Login');
+})->name('login');
+
+Route::post('/Login', function(Request $request){
+
+    $request->validate ([
+        'email' => ['required', 'email'],
+        'password' => ['required'],
+    ]);
+
+    $credentials = [
+        'email' => $request->email,
+        'password' => $request->password
+    ];
+
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+        return redirect('/Dashboard');
+    }
+
+    return back()->withErrors([
+        'email' => 'Wrong credentials'
+    ]);
+    
+});
+
+Route::get('/Forgotpassword', function (Request $request) {
+    return Inertia::render('Forgotpassword');
+});
+
+Route::middleware('auth')->group(function() {   
+Route::get('/Dashboard', function() {
+
+    $today = \Carbon\Carbon::today()->toDateString();
+
+    $attendanceData = [
+        'present' => \App\Models\Attendance::whereDate('date', $today)
+            ->whereRaw('LOWER(status) = ?', ['present'])
+            ->count(),
+
+        'absent' => \App\Models\Attendance::whereDate('date', $today)
+            ->whereRaw('LOWER(status) = ?', ['absent'])
+            ->count(),
+
+        'late' => \App\Models\Attendance::whereDate('date', $today)
+            ->whereRaw('LOWER(status) = ?', ['late'])
+            ->count(),
+
+        'excused' => \App\Models\Attendance::whereDate('date', $today)
+            ->whereRaw('LOWER(status) = ?', ['excused'])
+            ->count(),
+    ];
+
+    $platoonDataRaw = \App\Models\Attendance::with('user')
+        ->whereDate('date', $today)
+        ->get()
+        ->groupBy(function ($item) {
+            return $item->user->platoon ?? 'Unknown Platoon';
+        });
+
+    $platoonData = [];
+
+    foreach ($platoonDataRaw as $platoonName => $records) {
+        $platoonData[] = [
+            'platoon' => $platoonName,
+
+            'Present' => $records
+                ->filter(fn($item) => strtolower($item->status) === 'present')
+                ->count(),
+
+            'Late' => $records
+                ->filter(fn($item) => strtolower($item->status) === 'late')
+                ->count(),
+
+            'Absent' => $records
+                ->filter(fn($item) => strtolower($item->status) === 'absent')
+                ->count(),
+
+            'Excused' => $records
+                ->filter(fn($item) => strtolower($item->status) === 'excused')
+                ->count(),
+        ];
+    }
+
+    return Inertia::render('Dashboard', [
+        'user' => Auth::user(),
+        'attendanceData' => $attendanceData,
+        'platoonData' => $platoonData,
+    ]);
+
+});
+
+    // Announcement Routes
+    Route::get('/Announcement', [AnnouncementController::class, 'index'])->name('announcement.index');
+    Route::post('/Announcement', [AnnouncementController::class, 'store'])->name('announcement.store');
+    Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy']);
+    Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update']);
+    Route::put('/announcements/{announcement}/pin', [AnnouncementController::class, 'togglePin']);
+
+    Route::get('/Student', [UserController::class, 'index']);
+    Route::get('/student', [UserController::class, 'index'])->name('cadets.index');
+
+    Route::get('/Platoon', function() {
+        return Inertia::render('Platoon');
+    });
+
+    Route::get('/Excuseletter', function() {
+        return Inertia::render('Excuseletter');
+    });
+
+    Route::get('/Reports', function() {
+        return Inertia::render('Reports');
+    });
+
+    Route::get('/Usermanagement', [UserController::class, 'index']);
+    Route::put('/Usermanagement/{id}', [UserController::class, 'update']);
+    Route::delete('/Usermanagement/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+    Route::post('/Usermanagement/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');
+    Route::post('/Usermanagement/batch-archive', [UserController::class, 'batchArchive'])->name('users.batchArchive');
+    Route::patch('/users/assign-platoon', [UserController::class, 'assignPlatoon'])->name('users.assign-platoon');
+
+    Route::get('/Setting', function () {
+        return Inertia::render('Setting');
+    });
+    
+    Route::post('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
+
+    Route::post('/import-cadets', [UserController::class, 'import']);
+
+    Route::post('/admin/attendance/scan', [AttendanceController::class, 'scan'])->name('attendance.scan');
+
+    Route::get('/my-attendance', [AttendanceController::class, 'myAttendance'])->name('attendance.my');
+
+    Route::post('/Logout', function(Request $request) {
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/');
+    });
+});

@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Editimg from '../assets/editimg.svg';
 
 export default function Usertable({ users = [], onUpdateUser, onDeleteUser, onBatchDelete, onBatchArchive, platoons = [], onAssignPlatoon, currentUser }) {
     // Determine if the current user is an admin
     const isAdmin = currentUser?.role ? currentUser.role.toLowerCase() === 'admin' : true;
 
-    // Filter users if the current user is a platoon leader
-    const filteredUsers = (() => {
+    // Filter users if the current user is a platoon leader (Optimized with useMemo)
+    const filteredUsers = useMemo(() => {
         if (!currentUser) return users;
         const role = currentUser.role ? currentUser.role.toLowerCase() : '';
         if (role === 'leader' || role === 'platoon_leader') {
@@ -19,7 +19,7 @@ export default function Usertable({ users = [], onUpdateUser, onDeleteUser, onBa
             }
         }
         return users;
-    })();
+    }, [users, currentUser]);
 
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 6;
@@ -41,10 +41,17 @@ export default function Usertable({ users = [], onUpdateUser, onDeleteUser, onBa
     const [isPlatoonModalOpen, setIsPlatoonModalOpen] = useState(false);
     const [selectedPlatoonId, setSelectedPlatoonId] = useState('');
 
-    const totalPages = Math.ceil(filteredUsers.length / itemsPerPage) || 1;
+    // Memoized pagination math to prevent unnecessary lag on render
+    const totalPages = useMemo(() => {
+        return Math.ceil(filteredUsers.length / itemsPerPage) || 1;
+    }, [filteredUsers.length]);
+
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    const currentUsers = filteredUsers.slice(startIndex, endIndex);
+
+    const currentUsers = useMemo(() => {
+        return filteredUsers.slice(startIndex, endIndex);
+    }, [filteredUsers, startIndex, endIndex]);
 
     // Multi-select handlers
     const handleSelectAll = (e) => {

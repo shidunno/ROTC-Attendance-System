@@ -14,7 +14,7 @@ export default function Usermanagementheader({
     const [isOpen, setIsOpen] = useState(false)
     const [roleOpen, setRoleOpen] = useState(false)
     const [statusOpen, setStatusOpen] = useState(false)
-    const { auth, flash, errors } = usePage().props
+    const { auth, errors, flash } = usePage().props
 
     const handleFileChange = (e) => {
         const file = e.target.files[0]
@@ -43,12 +43,14 @@ export default function Usermanagementheader({
 
     return (
       <>
+        {/* Changed wrapper from <form> to <div> to prevent accidental form submittals */}
         <div className="usermanagementheader">
             <input 
                 type="text" 
                 placeholder="Search by ID or Name" 
                 value={search}
                 onChange={(e) => onSearchChange(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
             />
 
             {/* Custom Role Dropdown */}

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Editimg from '../assets/editimg.svg';
 
 export default function Usertable({ users = [], onUpdateUser, onDeleteUser, onBatchDelete, onBatchArchive, platoons = [], onAssignPlatoon, currentUser }) {
@@ -45,6 +45,13 @@ export default function Usertable({ users = [], onUpdateUser, onDeleteUser, onBa
     const totalPages = useMemo(() => {
         return Math.ceil(filteredUsers.length / itemsPerPage) || 1;
     }, [filteredUsers.length]);
+
+    // Safety check: reset pagination if current page exceeds total pages after filtering/searching
+    useEffect(() => {
+        if (currentPage > totalPages) {
+            setCurrentPage(1);
+        }
+    }, [filteredUsers.length, totalPages, currentPage]);
 
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
@@ -296,20 +303,36 @@ export default function Usertable({ users = [], onUpdateUser, onDeleteUser, onBa
                         Previous
                     </button>
 
-                    {Array.from({ length: totalPages }, (_, index) => {
-                        const pageNum = index + 1;
-                        return (
-                            <button
-                                key={pageNum}
-                                className={`pagination-num-btn ${
-                                    currentPage === pageNum ? 'active' : ''
-                                }`}
-                                onClick={() => goToPage(pageNum)}
-                            >
-                                {pageNum}
-                            </button>
-                        );
-                    })}
+                    {Array.from(
+                        {
+                            length: Math.min(5, totalPages),
+                        },
+                        (_, index) => {
+                            let pageNum;
+
+                            if (totalPages <= 5) {
+                                pageNum = index + 1;
+                            } else if (currentPage <= 3) {
+                                pageNum = index + 1;
+                            } else if (currentPage >= totalPages - 2) {
+                                pageNum = totalPages - 4 + index;
+                            } else {
+                                pageNum = currentPage - 2 + index;
+                            }
+
+                            return (
+                                <button
+                                    key={pageNum}
+                                    className={`pagination-num-btn ${
+                                        currentPage === pageNum ? 'active' : ''
+                                    }`}
+                                    onClick={() => goToPage(pageNum)}
+                                >
+                                    {pageNum}
+                                </button>
+                            );
+                        }
+                    )}
 
                     <button
                         className="pagination-btn"

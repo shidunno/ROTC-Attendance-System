@@ -13,6 +13,9 @@ class CadetsImport implements ToCollection, WithHeadingRow
 {
     public function collection(Collection $rows): void
     {
+        // Prevent PHP timeout during bulk operations
+        ini_set('max_execution_time', 120);
+
         $currentYear = date('Y');
 
         // 1. Get the latest sequence number once from the database
@@ -52,7 +55,8 @@ class CadetsImport implements ToCollection, WithHeadingRow
                 'custom_id'   => $customId,
                 'name'        => trim($row['name']),
                 'email'       => $email,
-                'password'    => Hash::make($temporaryPassword),
+                // 👇 FIXED: Lower rounds to 4 so hashing 100 passwords takes < 1 second 👇
+                'password'    => Hash::make($temporaryPassword, ['rounds' => 4]),
                 'role'        => 'cadet',
                 'status'      => 'Active',
                 'created_at'  => now(),

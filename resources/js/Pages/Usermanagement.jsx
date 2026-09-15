@@ -5,37 +5,39 @@ import Usertable from "@/Components/Usertable";
 import { router, usePage } from "@inertiajs/react";
 import { useState } from "react";
 
-export default function Usermanagement({ users = [], platoons = [], userCounts, filters = {} }) {
+export default function Usermanagement({ users = [], platoons = [], userCounts }) {
     // Get the authenticated user from Inertia page props
     const { auth } = usePage().props;
     const currentUser = auth.user;
 
-    const [search, setSearch] = useState(filters.search || '');
-    const [role, setRole] = useState(filters.role || '');
-    const [status, setStatus] = useState(filters.status || '');
+    const [search, setSearch] = useState('');
+    const [role, setRole] = useState('');
+    const [status, setStatus] = useState('');
 
-    // Centralized function to trigger Inertia GET requests with active filters
-    const applyFilters = (newFilters) => {
-        router.get('/Usermanagement', newFilters, {
-            preserveState: true,
-            preserveScroll: true,
-            replace: true,
-        });
-    };
+    // Filter the users array entirely in the browser (Instant, 0ms latency)
+    const filteredUsers = users.filter((user) => {
+        const matchesSearch = 
+            search === '' || 
+            user.name?.toLowerCase().includes(search.toLowerCase()) || 
+            user.id_number?.toString().toLowerCase().includes(search.toLowerCase());
 
+        const matchesRole = role === '' || user.role === role;
+        const matchesStatus = status === '' || user.status === status;
+
+        return matchesSearch && matchesRole && matchesStatus;
+    });
+
+    // Handlers only update local state—no server requests!
     const handleSearchChange = (value) => {
         setSearch(value);
-        applyFilters({ search: value, role, status });
     };
 
     const handleRoleChange = (value) => {
         setRole(value);
-        applyFilters({ search, role: value, status });
     };
 
     const handleStatusChange = (value) => {
         setStatus(value);
-        applyFilters({ search, role, status: value });
     };
 
     const handleUpdateUser = (userData) => {
@@ -83,7 +85,7 @@ export default function Usermanagement({ users = [], platoons = [], userCounts, 
                 />
                 <Usermanagementnumber userCounts={userCounts} />
                 <Usertable
-                    users={users}
+                    users={filteredUsers} // Pass the instantly filtered array here!
                     platoons={platoons}
                     currentUser={currentUser}
                     onUpdateUser={handleUpdateUser}

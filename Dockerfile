@@ -16,7 +16,7 @@ WORKDIR /var/www/html
 COPY composer.json composer.lock ./
 
 # Install production dependencies
-RUN composer install --no-dev --prefer-dist --no-interaction --no-scripts
+RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --prefer-dist --no-interaction --no-scripts -vvv
 
 # Copy the rest of the application code
 COPY . /var/www/html

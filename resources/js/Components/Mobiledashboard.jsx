@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-
 import { router } from "@inertiajs/react";
-
 import Layout from "@/Layouts/AuthenticatedLayout";
 
 import Qrimg from "../assets/qrimg.svg";
@@ -11,9 +9,7 @@ import Excuseletterimg from "../assets/excuseletterimgdashboard.svg";
 import Chatbotimg from "../assets/chatbotimg.svg";
 import Settingimg from "../assets/settingimgdashboard.svg";
 
-
 import Qrdashboard from "./Qrdashboard";
-import Excuseletterdashboard from "./Excuseletterdashboard";
 
 export default function Mobiledashboard({ user }) {
     const [currentView, setCurrentView] = useState("dashboard");
@@ -22,14 +18,6 @@ export default function Mobiledashboard({ user }) {
         return (
             <Qrdashboard
                 user={user}
-                onBack={() => setCurrentView("dashboard")}
-            />
-        );
-    }
-
-    if (currentView === "excuse") {
-        return (
-            <Excuseletterdashboard
                 onBack={() => setCurrentView("dashboard")}
             />
         );
@@ -112,9 +100,10 @@ export default function Mobiledashboard({ user }) {
                         <p>View announcements</p>
                     </div>
 
+                    {/* FIXED: Uses router.visit so it hits Laravel and loads submission history */}
                     <div
                         className="cadet-card"
-                        onClick={() => setCurrentView("excuse")}
+                        onClick={() => router.visit("/Excuseletter")}
                     >
                         <img src={Excuseletterimg} alt="Excuse Letter" />
 

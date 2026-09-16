@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AnnouncementController;
 use App\Models\Announcement;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\ExcuseLetterController;
 
 Route::get('/', function () { 
     return Inertia::render('Login');
@@ -117,10 +118,11 @@ Route::get('/Dashboard', function() {
         return Inertia::render('Platoon');
     });
 
-    Route::get('/Excuseletter', function() {
-        return Inertia::render('Excuseletter');
-    });
-
+    // Excuse Letter Routes
+    Route::get('/Excuseletter', [ExcuseLetterController::class, 'index'])->name('excuse-letters.index');
+    Route::post('/excuse-letters', [ExcuseLetterController::class, 'store'])->name('excuse-letters.store');
+    Route::post('/excuse-letters/{excuseLetter}', [ExcuseLetterController::class, 'update'])->name('excuse-letters.update');
+    
     Route::get('/Reports', function() {
         return Inertia::render('Reports');
     });

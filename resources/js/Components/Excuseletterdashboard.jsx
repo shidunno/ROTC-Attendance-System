@@ -1,20 +1,44 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Layout from "@/Layouts/AuthenticatedLayout";
+import { useForm, usePage, router } from '@inertiajs/react';
 
-export default function Excuseletterdashboard({ onBack }) {
-    const [dateOfAbsence, setDateOfAbsence] = useState('');
-    const [file, setFile] = useState(null);
+export default function Excuseletterdashboard() {
+    // 1. Grab the cadet's submission history passed from the controller
+    const { letters } = usePage().props;
+
+    const { data, setData, post, processing, errors, reset } = useForm({
+        date: '',
+        file: null,
+    });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Handle form submission logic here
+        
+        // Use a standard URL string instead of route()
+        post('/excuse-letters', {
+            forceFormData: true,
+            onSuccess: () => reset(),
+        });
+    };
+
+    // Helper to dynamically style the status text
+    const getStatusClass = (status) => {
+        switch (status) {
+            case 'accepted': return 'status-approved';
+            case 'rejected': return 'status-rejected';
+            default: return 'status-pending';
+        }
     };
 
     return (
         <Layout pageTitle={'Excuse Letter'}>
             <div className="excuse-letter-container">
                 {/* Back Button */}
-                <button className="excuse-back-btn" onClick={onBack}>
+                <button 
+                    className="excuse-back-btn" 
+                    onClick={() => router.visit('/Dashboard')} 
+                    type="button"
+                >
                     <span className="back-arrow">&larr;</span> Back
                 </button>
 
@@ -31,47 +55,51 @@ export default function Excuseletterdashboard({ onBack }) {
                             type="date"
                             id="absence-date"
                             className="form-input"
-                            value={dateOfAbsence}
-                            onChange={(e) => setDateOfAbsence(e.target.value)}
+                            value={data.date}
+                            onChange={(e) => setData('date', e.target.value)}
                             required
                         />
+                        {errors.date && <div className="text-red-500 text-sm mt-1">{errors.date}</div>}
                     </div>
 
                     <div className="form-group">
                         <label htmlFor="supporting-document" className="form-label">
-                            Supporting Document
+                            Supporting Document (PDF/Image)
                         </label>
                         <input
                             type="file"
                             id="supporting-document"
                             className="form-file-input"
-                            onChange={(e) => setFile(e.target.files[0])}
+                            onChange={(e) => setData('file', e.target.files[0])}
+                            required
                         />
+                        {errors.file && <div className="text-red-500 text-sm mt-1">{errors.file}</div>}
                     </div>
 
-                    <button type="submit" className="submit-excuse-btn">
-                        Submit Excuse Letter
+                    <button type="submit" className="submit-excuse-btn" disabled={processing}>
+                        {processing ? 'Submitting...' : 'Submit Excuse Letter'}
                     </button>
                 </form>
 
-                {/* Submission History Section */}
+                {/* Dynamic Submission History Section */}
                 <div className="submission-history-section">
                     <h2 className="history-title">Submission History</h2>
 
                     <div className="history-list">
-                        <div className="history-item">
-                            <h3 className="history-date">August 29, 2026</h3>
-                            <p className="history-status">
-                                STATUS: <span className="status-approved">Approved</span>
-                            </p>
-                        </div>
-
-                        <div className="history-item">
-                            <h3 className="history-date">July 29, 2026</h3>
-                            <p className="history-status">
-                                STATUS: <span className="status-rejected">Rejected</span>
-                            </p>
-                        </div>
+                        {letters && letters.length > 0 ? (
+                            letters.map((item) => (
+                                <div className="history-item" key={item.id}>
+                                    <h3 className="history-date">{item.date}</h3>
+                                    <p className="history-status">
+                                        STATUS: <span className={getStatusClass(item.status)}>
+                                            {item.status.toUpperCase()}
+                                        </span>
+                                    </p>
+                                </div>
+                            ))
+                        ) : (
+                            <p style={{ color: '#666' }}>No submission history found.</p>
+                        )}
                     </div>
                 </div>
             </div>

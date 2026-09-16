@@ -3001,6 +3001,20 @@ rect:focus {
     object-fit: cover;
 }
 
+#excuselettercontainer {
+    margin-top: 0 !important;
+    margin-bottom: 4px !important; /* Adjust this value if you want them tighter or slightly spaced */
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+#excuseletterinnercontainer {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+}
+
 @media (max-width: 1200px) {
 
     .previews {

@@ -84,6 +84,16 @@ return new class extends Migration
             $table->string('late_after')->nullable();
             $table->timestamps();
         });
+
+        Schema::create('excuse_letters', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->string('file_url');
+            $table->date('date');
+            $table->text('reason')->nullable();
+            $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
+            $table->timestamps();
+        });
     }
 
     public function down(): void
@@ -93,6 +103,7 @@ return new class extends Migration
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('attendances');
         Schema::dropIfExists('announcements');
+        Schema::dropIfExists('excuse_letters');
         
         // Safely drop the platoon_id foreign key constraint and column from users before dropping platoons table
         Schema::table('users', function (Blueprint $table) {

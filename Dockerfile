@@ -1,6 +1,6 @@
 FROM php:8.3-apache
 
-# Install system dependencies & PHP extensions required by Laravel
+# Install system dependencies & all common Laravel PHP extensions
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -8,7 +8,9 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
-    && docker-php-ext-install pdo_mysql zip exif pcntl bcmath gd
+    libcurl4-openssl-dev \
+    pkg-config \
+    && docker-php-ext-install pdo_mysql zip exif pcntl bcmath gd mbstring xml dom curl fileinfo
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -16,17 +18,11 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy composer files first to leverage Docker caching
-COPY composer.json composer.lock ./
-
-# Install Composer dependencies without running scripts or dev packages first
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
-
-# Copy the rest of the application files
+# Copy project files
 COPY . /var/www/html
 
-# Finish composer dump-autoload and scripts
-RUN composer dump-autoload --optimize
+# Install dependencies with verbose output so we can see the exact error if it fails
+RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
 
 # Set permissions for Laravel storage and cache folders
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache

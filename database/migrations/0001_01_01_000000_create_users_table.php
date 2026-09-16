@@ -94,6 +94,16 @@ return new class extends Migration
             $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
             $table->timestamps();
         });
+
+        Schema::create('generated_reports', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('generated_by')->constrained('users')->onDelete('cascade');
+            $table->string('report_type')->default('monthly_attendance');
+            $table->string('month'); // e.g., '09'
+            $table->string('year');  // e.g., '2026'
+            $table->string('file_path')->nullable();
+            $table->timestamps();
+        });
     }
 
     public function down(): void

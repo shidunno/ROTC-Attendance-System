@@ -10,55 +10,55 @@ use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
     class AttendanceController extends Controller
     {
-        public function index()
-        {
-            $today = Carbon::today()->toDateString();
+public function index()
+    {
+        $today = Carbon::today()->toDateString();
 
-            // 1. Transform attendance counts into an associative array for Dashboard props
-            $rawAttendance = Attendance::where('date', $today)
-                ->select('status', DB::raw('count(*) as count'))
-                ->groupBy('status')
-                ->pluck('count', 'status');
+        // 1. Fast aggregated attendance counts for summary boxes
+        $rawAttendance = Attendance::where('date', $today)
+            ->select('status', DB::raw('count(*) as count'))
+            ->groupBy('status')
+            ->pluck('count', 'status');
 
-            $attendanceData = [
-                'present' => $rawAttendance->get('present', 0) + $rawAttendance->get('Present', 0),
-                'late'    => $rawAttendance->get('late', 0) + $rawAttendance->get('Late', 0),
-                'absent'  => $rawAttendance->get('absent', 0) + $rawAttendance->get('Absent', 0),
-                'excused' => $rawAttendance->get('excused', 0) + $rawAttendance->get('Excused', 0),
-            ];
+        $attendanceData = [
+            'present' => $rawAttendance->get('present', 0) + $rawAttendance->get('Present', 0),
+            'late'    => $rawAttendance->get('late', 0) + $rawAttendance->get('Late', 0),
+            'absent'  => $rawAttendance->get('absent', 0) + $rawAttendance->get('Absent', 0),
+            'excused' => $rawAttendance->get('excused', 0) + $rawAttendance->get('Excused', 0),
+        ];
 
-            // 2. Query attendance grouped by user platoon, using ONLY the raw number column
-            $platoonDataRaw = Attendance::with('user.platoon')
-                ->where('date', $today)
-                ->get()
-                ->groupBy(function($item) {
-                    if ($item->user && $item->user->platoon) {
-                        return is_object($item->user->platoon) 
-                            ? ($item->user->platoon->number ?? $item->user->platoon->id ?? 1) 
-                            : $item->user->platoon;
-                    }
-                    return 'N/A';
-                });
-
-            // 3. Format into the clean structure Recharts expects (storing just the number)
-            $platoonData = [];
-            foreach ($platoonDataRaw as $platoonNumber => $records) {
-                $platoonData[] = [
-                    'platoon' => $platoonNumber, // Pure number/ID (e.g., 1, 2, 3)
-                    'Present' => $records->filter(fn($i) => strtolower($i->status) === 'present')->count(),
-                    'Late'    => $records->filter(fn($i) => strtolower($i->status) === 'late')->count(),
-                    'Absent'  => $records->filter(fn($i) => strtolower($i->status) === 'absent')->count(),
-                    'Excused' => $records->filter(fn($i) => strtolower($i->status) === 'excused')->count(),
+        // 2. Fast database join/grouping for the bar graph (avoids loading massive row collections into PHP memory)
+        $platoonData = DB::table('attendances')
+            ->join('users', 'attendances.user_id', '=', 'users.id')
+            ->leftJoin('platoons', 'users.platoon_id', '=', 'platoons.id')
+            ->where('attendances.date', $today)
+            ->select(
+                DB::raw('COALESCE(platoons.number, platoons.id, users.platoon, "N/A") as platoon'),
+                'attendances.status',
+                DB::raw('count(*) as total')
+            )
+            ->groupBy('platoon', 'attendances.status')
+            ->get()
+            ->groupBy('platoon')
+            ->map(function ($rows, $platoonName) {
+                return [
+                    'platoon' => $platoonName,
+                    'Present' => $rows->first(fn($r) => strtolower($r->status) === 'present')?->total ?? 0,
+                    'Late'    => $rows->first(fn($r) => strtolower($r->status) === 'late')?->total ?? 0,
+                    'Absent'  => $rows->first(fn($r) => strtolower($r->status) === 'absent')?->total ?? 0,
+                    'Excused' => $rows->first(fn($r) => strtolower($r->status) === 'excused')?->total ?? 0,
                 ];
-            }
+            })
+            ->values()
+            ->all();
 
-            return Inertia::render('Dashboard', [
-                'user' => auth()->user(),
-                'role' => auth()->user()->role ?? 'admin',
-                'attendanceData' => $attendanceData,
-                'platoonData' => $platoonData,
-            ]);
-        }
+        return Inertia::render('Dashboard', [
+            'user' => auth()->user(),
+            'role' => auth()->user()->role ?? 'admin',
+            'attendanceData' => $attendanceData,
+            'platoonData' => $platoonData,
+        ]);
+    }
 
         public function scan(Request $request)
         {

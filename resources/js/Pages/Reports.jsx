@@ -7,7 +7,6 @@ export default function Reports() {
     return(
         <>  
             <Layout pageTitle={'Reports'}>
-                <Searchuser/>
                <Reportstab/>
             </Layout>
         </>

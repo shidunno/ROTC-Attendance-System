@@ -10,6 +10,7 @@ use App\Http\Controllers\AnnouncementController;
 use App\Models\Announcement;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\ExcuseLetterController;
+use App\Http\Controllers\ReportController;
 
 Route::get('/', function () { 
     return Inertia::render('Login');
@@ -122,6 +123,8 @@ Route::get('/Dashboard', function() {
     Route::get('/Excuseletter', [ExcuseLetterController::class, 'index'])->name('excuse-letters.index');
     Route::post('/excuse-letters', [ExcuseLetterController::class, 'store'])->name('excuse-letters.store');
     Route::post('/excuse-letters/{excuseLetter}', [ExcuseLetterController::class, 'update'])->name('excuse-letters.update');
+
+    Route::get('/reports/export-excel', [ReportController::class, 'exportMonthlyExcel']);
     
     Route::get('/Reports', function() {
         return Inertia::render('Reports');

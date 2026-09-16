@@ -1,16 +1,10 @@
 FROM php:8.3-apache
 
-# Install system dependencies & all common Laravel PHP extensions
-RUN apt-get update && apt-get install -y \
-    git \
-    unzip \
-    libzip-dev \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    libcurl4-openssl-dev \
-    pkg-config \
-    && docker-php-ext-install pdo_mysql zip exif pcntl bcmath gd mbstring xml dom curl fileinfo
+# Copy the official PHP extension installer utility
+COPY --from=mlocati/php-extension-installer:latest /usr/bin/install-php-extensions /usr/local/bin/
+
+# Install all required PHP extensions safely and pre-compiled (no compilation crashes)
+RUN install-php-extensions pdo_mysql zip exif pcntl bcmath gd mbstring xml dom curl fileinfo
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -18,11 +12,17 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy project files
+# Copy composer files first for optimal caching
+COPY composer.json composer.lock ./
+
+# Install production dependencies
+RUN composer install --no-dev --prefer-dist --no-interaction --no-scripts
+
+# Copy the rest of the application code
 COPY . /var/www/html
 
-# Install dependencies with verbose (-v) flag to show the exact error
-RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction -v
+# Run composer dump-autoload
+RUN composer dump-autoload --optimize
 
 # Set permissions for Laravel storage and cache folders
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache

@@ -21,8 +21,8 @@ WORKDIR /var/www/html
 # Copy project files
 COPY . /var/www/html
 
-# Install dependencies with verbose output so we can see the exact error if it fails
-RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
+# Install dependencies with verbose (-v) flag to show the exact error
+RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction -v
 
 # Set permissions for Laravel storage and cache folders
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache

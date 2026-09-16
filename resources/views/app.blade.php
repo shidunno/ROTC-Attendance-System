@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @viteReactRefresh
-    @vite('resources/js/app.jsx')
+    @vite('resources/js/App.jsx')
     @inertiaHead
     <title>Document</title>
 </head>

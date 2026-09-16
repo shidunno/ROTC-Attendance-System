@@ -16,11 +16,17 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy project files into the container
+# Copy composer files first to leverage Docker caching
+COPY composer.json composer.lock ./
+
+# Install Composer dependencies without running scripts or dev packages first
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
+
+# Copy the rest of the application files
 COPY . /var/www/html
 
-# Install Laravel dependencies
-RUN composer install --no-dev --optimize-autoloader
+# Finish composer dump-autoload and scripts
+RUN composer dump-autoload --optimize
 
 # Set permissions for Laravel storage and cache folders
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache

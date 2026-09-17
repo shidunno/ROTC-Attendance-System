@@ -13,7 +13,7 @@ FROM php:8.4-apache
 
 COPY --from=mlocati/php-extension-installer:latest /usr/bin/install-php-extensions /usr/local/bin/
 
-RUN install-php-extensions pdo_mysql zip exif pcntl bcmath gd mbstring xml dom curl fileinfo
+RUN install-php-extensions pdo_mysql pdo_pgsql zip exif pcntl bcmath gd mbstring xml dom curl fileinfo
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -36,3 +36,5 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-av
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
 RUN a2enmod rewrite
+
+CMD php artisan migrate --force && php artisan db:seed --force && apache2-foreground

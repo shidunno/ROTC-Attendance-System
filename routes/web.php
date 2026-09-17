@@ -11,6 +11,8 @@ use App\Models\Announcement;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\ExcuseLetterController;
 use App\Http\Controllers\ReportController;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
 
 Route::get('/', function () { 
     return Inertia::render('Login');
@@ -41,6 +43,29 @@ Route::post('/Login', function(Request $request){
 
 Route::get('/Forgotpassword', function (Request $request) {
     return Inertia::render('Forgotpassword');
+});
+
+Route::post('/Forgotpassword', function (Request $request) {
+    $request->validate(['email' => 'required|email']);
+
+    $user = DB::table('users')->where('email', $request->email)->first();
+
+    if (!$user) {
+        return back()->withErrors(['email' => 'No account found with that email.']);
+    }
+
+    $code = random_int(100000, 999999);
+
+    DB::table('password_reset_tokens')->updateOrInsert(
+        ['email' => $request->email],
+        ['token' => $code, 'created_at' => now()]
+    );
+
+    Mail::raw("Your ROTC Attendance System password reset code is: $code", function ($message) use ($request) {
+        $message->to($request->email)->subject('Your Password Reset Code');
+    });
+
+    return back()->with('status', 'Reset code sent to your email.');
 });
 
 Route::middleware('auth')->group(function() {   

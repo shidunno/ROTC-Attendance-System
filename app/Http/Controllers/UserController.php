@@ -10,6 +10,7 @@ use Maatwebsite\Excel\Validators\ValidationException;
 use Inertia\Inertia;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -333,4 +334,30 @@ public function index(Request $request)
 
         return back()->with('success', 'Platoons assigned successfully.');
     }
+
+    public function changePassword(Request $request)
+{
+    $user = $request->user();
+
+    $validated = $request->validate([
+        'current_password' => ['required'],
+        'new_password' => ['required', 'string', 'min:6', 'confirmed'],
+    ]);
+
+    if (!Hash::check($validated['current_password'], $user->password)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Current password is incorrect.',
+        ], 422);
+    }
+
+    $user->update([
+        'password' => Hash::make($validated['new_password']),
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Password successfully updated!',
+    ]);
+}
 }

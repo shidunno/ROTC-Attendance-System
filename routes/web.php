@@ -155,6 +155,8 @@ Route::get('/Dashboard', function() {
         return Inertia::render('Reports');
     });
 
+    Route::post('/change-password', [UserController::class, 'changePassword'])->name('password.change');
+
     Route::get('/Usermanagement', [UserController::class, 'index']);
     Route::put('/Usermanagement/{id}', [UserController::class, 'update']);
     Route::delete('/Usermanagement/{id}', [UserController::class, 'destroy'])->name('users.destroy');

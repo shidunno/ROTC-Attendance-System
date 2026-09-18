@@ -15,10 +15,10 @@ class DatabaseSeeder extends Seeder
     {
         // 1. Admin User
         User::updateOrCreate(
-            ['custom_id' => 'ADM-001'],
+            ['email' => 'admin@gmail.com'],
             [
+                'custom_id' => 'ADM-001',
                 'name' => 'System Admin',
-                'email' => 'admin@gmail.com',
                 'password' => Hash::make('qazplm09'),
                 'role' => 'admin',
             ]
@@ -26,10 +26,10 @@ class DatabaseSeeder extends Seeder
 
         // 2. Leader User
         User::updateOrCreate(
-            ['custom_id' => 'LDR-001'],
+            ['email' => 'leader@gmail.com'],
             [
+                'custom_id' => 'LDR-001',
                 'name' => 'Squad Leader',
-                'email' => 'leader@gmail.com',
                 'password' => Hash::make('qazplm09'),
                 'role' => 'leader',
             ]
@@ -37,10 +37,10 @@ class DatabaseSeeder extends Seeder
 
         // 3. Cadet User
         User::updateOrCreate(
-            ['custom_id' => 'CDT-001'],
+            ['email' => 'cadet@gmail.com'],
             [
+                'custom_id' => 'CDT-001',
                 'name' => 'ROTC Cadet',
-                'email' => 'cadet@gmail.com',
                 'password' => Hash::make('qazplm09'),
                 'role' => 'cadet',
             ]

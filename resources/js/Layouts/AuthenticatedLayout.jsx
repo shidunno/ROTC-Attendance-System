@@ -18,7 +18,6 @@ export default function Layout({children, pageTitle}) {
     function DesktopDropdown() {
         return (
             <>
-                <div className="dropdown-item"><Link>Profile</Link></div>
                 <div className="dropdown-item"><Link href='/Logout' onClick={handleLogout}>Logout</Link></div>
             </>
         );

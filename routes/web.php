@@ -12,6 +12,7 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\ExcuseLetterController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 
 Route::get('/', function () { 
@@ -67,6 +68,33 @@ Route::post('/Forgotpassword', function (Request $request) {
 
     return back()->with('status', 'Reset code sent to your email.');
 });
+
+// Verify Password Reset Code
+Route::post('/VerifyCode', function (Request $request) {
+
+    $request->validate([
+        'email' => 'required|email',
+        'code' => 'required|digits:6',
+    ]);
+
+    $resetToken = DB::table('password_reset_tokens')
+        ->where('email', $request->email)
+        ->where('token', $request->code)
+        ->first();
+
+    if (!$resetToken) {
+        return back()->withErrors([
+            'code' => 'Invalid verification code.'
+        ]);
+    }
+
+    return Inertia::render('Resetpassword', [
+        'email' => $request->email,
+        'code' => $request->code,
+    ]);
+
+});
+
 
 Route::middleware('auth')->group(function() {   
 Route::get('/Dashboard', function() {
@@ -184,4 +212,44 @@ Route::get('/Dashboard', function() {
 
         return redirect('/');
     });
+});
+
+// Reset Password
+Route::post('/Resetpassword', function (Request $request) {
+
+    $request->validate([
+        'email' => 'required|email',
+        'code' => 'required|digits:6',
+        'password' => 'required|min:8|confirmed',
+    ]);
+
+    $resetToken = DB::table('password_reset_tokens')
+        ->where('email', $request->email)
+        ->where('token', $request->code)
+        ->first();
+
+    if (!$resetToken) {
+        return back()->withErrors([
+            'code' => 'Invalid verification code.'
+        ]);
+    }
+
+    if (now()->diffInMinutes($resetToken->created_at) > 15) {
+        return back()->withErrors([
+            'code' => 'Verification code has expired.'
+        ]);
+    }
+
+    DB::table('users')
+        ->where('email', $request->email)
+        ->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+    DB::table('password_reset_tokens')
+        ->where('email', $request->email)
+        ->delete();
+
+    return redirect('/')->with('status', 'Password changed successfully.');
+
 });

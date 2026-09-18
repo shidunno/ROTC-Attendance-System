@@ -3015,6 +3015,46 @@ rect:focus {
     padding-bottom: 4px !important;
 }
 
+/* ==========================================================
+   Modern styling for Inertia's built-in NProgress loading bar
+   Add this to your resources/css/app.css
+   ========================================================== */
+
+#nprogress .bar {
+  height: 4px;
+  background: linear-gradient(90deg, #7BA05B, #a3d977);
+  box-shadow: 0 0 10px rgba(123, 160, 91, 0.7), 0 0 5px rgba(123, 160, 91, 0.5);
+  border-radius: 0 2px 2px 0;
+}
+
+/* Glow "comet" effect at the tip of the bar */
+#nprogress .peg {
+  display: block;
+  position: absolute;
+  right: 0;
+  width: 100px;
+  height: 100%;
+  box-shadow: 0 0 10px #7BA05B, 0 0 5px #7BA05B;
+  opacity: 1;
+  transform: rotate(3deg) translate(0px, -4px);
+}
+
+/* Optional: modern spinner (only shows if showSpinner: true) */
+#nprogress .spinner-icon {
+  width: 20px;
+  height: 20px;
+  border: 2px solid transparent;
+  border-top-color: #7BA05B;
+  border-left-color: #7BA05B;
+  border-radius: 50%;
+  animation: nprogress-spin 0.6s linear infinite;
+}
+
+@keyframes nprogress-spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 @media (max-width: 1200px) {
 
     .previews {

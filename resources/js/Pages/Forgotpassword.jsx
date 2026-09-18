@@ -1,14 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useForm } from '@inertiajs/react';
 
 export default function Forgotpassword() {
+    const [codeSent, setCodeSent] = useState(false);
+
     const { data, setData, post, processing, errors, recentlySuccessful } = useForm({
         email: '',
+        code: '',
     });
 
     const submit = (e) => {
         e.preventDefault();
-        post('/Forgotpassword');
+        post('/Forgotpassword', {
+            onSuccess: () => setCodeSent(true),
+        });
+    };
+
+    const submitCode = (e) => {
+        e.preventDefault();
+        post('/VerifyCode');
     };
 
     return (
@@ -25,14 +35,24 @@ export default function Forgotpassword() {
                     <form className="change-password-form" style={{ width: '100%', maxWidth: '480px' }} onSubmit={submit}>
                         <div className="profile-field-group" style={{ textAlign: 'left' }}>
                             <label htmlFor="email">Email Address</label>
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                value={data.email}
-                                onChange={(e) => setData('email', e.target.value)}
-                                placeholder="Enter email address"
-                            />
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    value={data.email}
+                                    onChange={(e) => setData('email', e.target.value)}
+                                    placeholder="Enter email address"
+                                    style={{ flex: 1 }}
+                                />
+                                <button
+                                    type="submit"
+                                    className="change-password-btn"
+                                    disabled={processing}
+                                >
+                                    {processing ? 'Sending...' : 'Send Code'}
+                                </button>
+                            </div>
                             {errors.email && <div style={{ color: 'red', fontSize: '0.85rem' }}>{errors.email}</div>}
                         </div>
 
@@ -40,13 +60,29 @@ export default function Forgotpassword() {
                             <div style={{ color: 'green', marginBottom: '1rem' }}>Reset code sent! Check your email.</div>
                         )}
 
+                        <div className="profile-field-group" style={{ textAlign: 'left' }}>
+                            <label htmlFor="code">Verification Code</label>
+                            <input
+                                type="text"
+                                id="code"
+                                name="code"
+                                maxLength={6}
+                                value={data.code}
+                                onChange={(e) => setData('code', e.target.value)}
+                                placeholder="Enter 6-digit code"
+                                disabled={!codeSent}
+                            />
+                            {errors.code && <div style={{ color: 'red', fontSize: '0.85rem' }}>{errors.code}</div>}
+                        </div>
+
                         <button
-                            type="submit"
+                            type="button"
                             className="change-password-btn"
                             style={{ width: '100%', marginTop: '0.5rem' }}
-                            disabled={processing}
+                            onClick={submitCode}
+                            disabled={processing || !codeSent}
                         >
-                            {processing ? 'Sending...' : 'Send Reset Code'}
+                            {processing ? 'Verifying...' : 'Change Password'}
                         </button>
 
                         <div style={{ marginTop: '1rem' }}>

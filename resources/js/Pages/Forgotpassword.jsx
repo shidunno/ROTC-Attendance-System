@@ -35,7 +35,7 @@ export default function Forgotpassword() {
                     <form className="change-password-form" style={{ width: '100%', maxWidth: '480px' }} onSubmit={submit}>
                         <div className="profile-field-group" style={{ textAlign: 'left' }}>
                             <label htmlFor="email">Email Address</label>
-                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <div className="email-flex-container">
                                 <input
                                     type="email"
                                     id="email"

@@ -34,11 +34,6 @@ export default function Mobiledashboard({ user }) {
                     <h1 className="student-name">
                         {user?.name || "Student Name!"}
                     </h1>
-
-                    <div className="cadet-badge">
-                        {user?.section || "BSIT 3-6"} •{" "}
-                        {user?.platoon || "Platoon 1"}
-                    </div>
                 </div>
 
                 {/* Status Card */}

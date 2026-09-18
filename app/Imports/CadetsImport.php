@@ -2,9 +2,11 @@
 
 namespace App\Imports;
 
+use App\Mail\CadetCredentialsMail;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -13,12 +15,11 @@ class CadetsImport implements ToCollection, WithHeadingRow
 {
     public function collection(Collection $rows): void
     {
-        // Prevent PHP timeout during bulk operations
         ini_set('max_execution_time', 120);
 
         $currentYear = date('Y');
 
-        // 1. Get the latest sequence number once from the database
+        // Get the latest sequence number for this year once
         $latestUser = User::where('custom_id', 'like', "CAD-{$currentYear}-%")
             ->orderBy('id', 'desc')
             ->first();
@@ -29,7 +30,8 @@ class CadetsImport implements ToCollection, WithHeadingRow
         }
 
         $usersData = [];
-        $existingEmails = User::pluck('email')->toArray(); // Fetch existing emails once for quick checking
+        $pendingEmails = []; // holds plain-text creds just long enough to queue the mail
+        $existingEmails = User::pluck('email')->toArray();
 
         foreach ($rows as $row) {
             // Skip empty rows or rows missing required fields
@@ -39,34 +41,49 @@ class CadetsImport implements ToCollection, WithHeadingRow
 
             $email = trim($row['email']);
 
-            // Skip duplicates within the file or database to prevent crashes
+            // Skip duplicates within the file or database
             if (in_array($email, $existingEmails)) {
                 continue;
             }
-            $existingEmails[] = $email; // Track to prevent duplicates inside the same file
+            $existingEmails[] = $email;
 
-            // Format custom_id
             $customId = sprintf("CAD-%s-%04d", $currentYear, $nextSequence++);
-            
-            // Generate a random temporary password
+            $name = trim($row['name']);
             $temporaryPassword = Str::random(10);
 
             $usersData[] = [
                 'custom_id'   => $customId,
-                'name'        => trim($row['name']),
+                'name'        => $name,
                 'email'       => $email,
-                // 👇 FIXED: Lower rounds to 4 so hashing 100 passwords takes < 1 second 👇
-                'password'    => Hash::make($temporaryPassword, ['rounds' => 4]),
+                'password'    => Hash::make($temporaryPassword),
                 'role'        => 'cadet',
                 'status'      => 'Active',
                 'created_at'  => now(),
                 'updated_at'  => now(),
             ];
+
+            // Keep the plain password only in memory, only to queue the email below
+            $pendingEmails[] = [
+                'name'      => $name,
+                'custom_id' => $customId,
+                'email'     => $email,
+                'password'  => $temporaryPassword,
+            ];
         }
 
-        // 2. Insert all rows in one single database query batch
+        // Insert all rows in one batch
         if (!empty($usersData)) {
             User::insert($usersData);
+        }
+
+        // Queue one credentials email per cadet
+        foreach ($pendingEmails as $cred) {
+            Mail::to($cred['email'])->queue(new CadetCredentialsMail(
+                $cred['name'],
+                $cred['custom_id'],
+                $cred['email'],
+                $cred['password'],
+            ));
         }
     }
 }

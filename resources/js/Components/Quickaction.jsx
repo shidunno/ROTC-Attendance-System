@@ -28,7 +28,7 @@ export default function Quickaction({user: propUser}) {
 
                             <div id = 'quickactionbuttoncontainer'>
                                 <button className = 'quickactionbutton' onClick = {() => router.visit('/Announcement')} type = 'submit'>View Announcement</button>
-                                <button className = 'quickactionbutton' onClick = {() => router.visit('/Reports')} type = 'submit'>View Daily Report</button>
+                                <button className = 'quickactionbutton' onClick = {() => router.visit('/Reports')} type = 'submit'>View Report</button>
                                 <button className = 'quickactionbutton' onClick = {() => router.visit('/Excuseletter')} type = 'submit'>View Excuse Letters</button>
                                 <button className = 'quickactionbutton' onClick = {() => router.visit('/Platoon')} type = 'submit'>Manage Cadets</button>
                             </div>
@@ -78,7 +78,7 @@ export default function Quickaction({user: propUser}) {
 
                             <div id = 'quickactionbuttoncontainer'>
                                 <button className = 'quickactionbutton' onClick = {() => router.visit('/Announcement')} type = 'submit'>Create Announcement</button>
-                                <button className = 'quickactionbutton' onClick = {() => router.visit('/Reports')} type = 'submit'>View Daily Report</button>
+                                <button className = 'quickactionbutton' onClick = {() => router.visit('/Reports')} type = 'submit'>View Report</button>
                                 <button className = 'quickactionbutton' onClick = {() => router.visit('/Excuseletter')} type = 'submit'>View Excuse Letters</button>
                                 <button className = 'quickactionbutton' onClick = {() => router.visit('/Usermanagement')} type = 'submit'>Manage Users</button>
                             </div>

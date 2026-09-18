@@ -29,8 +29,8 @@ export default function Layout({children, pageTitle}) {
                 <>
                     <div className="dropdown-item"><Link href='/Dashboard'>Dashboard</Link></div>
                     <div className="dropdown-item"><Link href='/Announcement'>Announcement</Link></div>
-                    <div className="dropdown-item"><Link href='/Platoon'>Platoon</Link></div>
                     <div className="dropdown-item"><Link href='/Excuseletter'>Excuse Letter</Link></div>
+                    <div className="dropdown-item"><Link href='/Reports'>Report</Link></div>
                     <div className='dropdown-item'><Link href ='/Usermanagement'>Users</Link></div>
                     <div className="dropdown-item"><Link href='/Setting'>Setting</Link></div>
                     <div className="dropdown-item"><Link href='/Logout' onClick={handleLogout}>Logout</Link></div>

@@ -178,6 +178,8 @@ Route::get('/Dashboard', function() {
     Route::post('/excuse-letters/{excuseLetter}', [ExcuseLetterController::class, 'update'])->name('excuse-letters.update');
 
     Route::get('/reports/export-excel', [ReportController::class, 'exportMonthlyExcel']);
+
+    Route::post('/admin/attendance-rules', [AttendanceController::class, 'updateRules'])->name('attendance.rules.update');
     
     Route::get('/Reports', function() {
         return Inertia::render('Reports');

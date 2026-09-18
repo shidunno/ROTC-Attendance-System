@@ -194,4 +194,27 @@ public function index()
                 'recentScans' => $recentScans,
             ]);
         }
+
+public function updateRules(Request $request)
+    {
+        $validated = $request->validate([
+            'time_in_start' => 'required|string',
+            'time_in_end'   => 'required|string',
+            'late_after'    => 'required|string',
+        ]);
+
+        // Finds the first record, or creates it if the table is totally empty
+        DB::table('attendance_rules')->updateOrInsert(
+            ['id' => DB::raw('id')] , // Matches whatever the first row is, or handles empty tables gracefully
+            [
+                'time_in_start' => $validated['time_in_start'],
+                'time_in_end'   => $validated['time_in_end'],
+                'late_after'    => $validated['late_after'],
+                'updated_at'    => now(),
+                'created_at'    => now(),
+            ]
+        );
+
+        return back()->with('success', 'Attendance rules updated successfully.');
+    }
     }

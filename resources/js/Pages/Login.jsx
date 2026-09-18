@@ -30,7 +30,7 @@ export default function login() {
                 <form className = 'login' onSubmit={handleLogin}>
                     <img src = {rotcLogo}></img>
                     <h1>Reserve Officers’ Training Corps (ROTC)Attendance System</h1>
-                    <input id = 'username' name = 'username' type = 'text' placeholder='Enter User ID'/>
+                    <input id = 'username' name = 'username' type = 'text' placeholder='Enter User Email'/>
                     <br/>
                     <input id = 'password' name = 'password' type='password' placeholder='Enter User Password'/>
                     {loginError && (

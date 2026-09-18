@@ -1,18 +1,16 @@
 import React from 'react';
 import { useForm } from '@inertiajs/react';
 
-export default function Attendancerules({ onBack }) {
+export default function Attendancerules({ onBack, rules }) {
     const { data, setData, post, processing, errors } = useForm({
-        time_in_start: '',
-        time_in_end: '',
-        time_out_start: '',
-        time_out_end: '',
-        late_after: '',
+        time_in_start: rules?.time_in_start || '',
+        time_in_end: rules?.time_in_end || '',
+        late_after: rules?.late_after || '',
     });
 
     const submit = (e) => {
         e.preventDefault();
-        post('/admin/attendance-rules'); // Update this route to match your Laravel backend route
+        post('/admin/attendance-rules'); 
     };
 
     return (
@@ -27,7 +25,7 @@ export default function Attendancerules({ onBack }) {
                 </button>
                 <div className="system-info-title-group">
                     <h1>Attendance Rules</h1>
-                    <p>Manage time-in, time-out, and late rules</p>
+                    <p>Manage time-in and late rules</p>
                 </div>
             </div>
 
@@ -70,41 +68,6 @@ export default function Attendancerules({ onBack }) {
                         </div>
                     </div>
 
-                    {/* Time-Out Row */}
-                    <div style={{ display: 'flex', gap: '1.5rem', width: '100%', flexWrap: 'wrap' }}>
-                        <div className="sys-form-group" style={{ flex: '1 1 200px' }}>
-                            <label htmlFor="timeOutStart" style={{ marginTop: 0 }}>Time-Out Start</label>
-                            <div style={{ position: 'relative' }}>
-                                <input 
-                                    type="text" 
-                                    id="timeOutStart" 
-                                    value={data.time_out_start}
-                                    onChange={e => setData('time_out_start', e.target.value)}
-                                    placeholder="e.g., 12:00 PM"
-                                    style={{ width: '100%', paddingRight: '2.5rem' }}
-                                />
-                                <span style={clockIconStyle}>🕒</span>
-                            </div>
-                            {errors.time_out_start && <span style={{ color: '#dc2626', fontSize: '0.85rem' }}>{errors.time_out_start}</span>}
-                        </div>
-
-                        <div className="sys-form-group" style={{ flex: '1 1 200px' }}>
-                            <label htmlFor="timeOutEnd" style={{ marginTop: 0 }}>Time-Out End</label>
-                            <div style={{ position: 'relative' }}>
-                                <input 
-                                    type="text" 
-                                    id="timeOutEnd" 
-                                    value={data.time_out_end}
-                                    onChange={e => setData('time_out_end', e.target.value)}
-                                    placeholder="e.g., 1:00 PM"
-                                    style={{ width: '100%', paddingRight: '2.5rem' }}
-                                />
-                                <span style={clockIconStyle}>🕒</span>
-                            </div>
-                            {errors.time_out_end && <span style={{ color: '#dc2626', fontSize: '0.85rem' }}>{errors.time_out_end}</span>}
-                        </div>
-                    </div>
-
                     {/* Late After Single Field Row */}
                     <div className="sys-form-group">
                         <label htmlFor="lateAfter" style={{ marginTop: 0 }}>Late After</label>
@@ -130,7 +93,6 @@ export default function Attendancerules({ onBack }) {
     );
 }
 
-// Inline helper positioning for clock icons inside inputs
 const clockIconStyle = {
     position: 'absolute',
     right: '1rem',

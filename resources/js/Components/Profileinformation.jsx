@@ -38,19 +38,19 @@ export default function ProfileInformation({ onBack }) {
     }
   };
 
-  const handleSubmit = (e) => {
+    const handleSubmit = (e) => {
     e.preventDefault();
 
     post('/profile/update', {
-      preserveScroll: true,
       forceFormData: true,
+      preserveScroll: true,
 
       onSuccess: (page) => {
         const updatedUser = page.props.auth?.user;
 
         if (updatedUser?.profile_photo_path) {
           setPhotoPreview(
-            `/storage/${updatedUser.profile_photo_path}`
+            `/storage/${updatedUser.profile_photo_path}?v=${Date.now()}`
           );
         }
       },

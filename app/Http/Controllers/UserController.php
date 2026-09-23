@@ -321,7 +321,7 @@ class UserController extends Controller
                     'required',
                     'email',
                     'max:255',
-                    Rule::unique('users')->ignore($user->id)
+                    Rule::unique('users')->ignore($user->id),
                 ]
                 : ['nullable'],
 
@@ -334,19 +334,17 @@ class UserController extends Controller
         ]);
 
         if ($isAdmin) {
-            $user->update([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-            ]);
+            $user->name = $validated['name'];
+            $user->email = $validated['email'];
         }
 
         if ($request->hasFile('avatar')) {
             $path = $request->file('avatar')->store('avatars', 'public');
 
-            $user->update([
-                'profile_photo_path' => $path,
-            ]);
+            $user->profile_photo_path = $path;
         }
+
+        $user->save();
 
         return back()->with('success', 'Profile updated successfully.');
     }

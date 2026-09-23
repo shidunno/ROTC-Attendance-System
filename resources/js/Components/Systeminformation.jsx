@@ -1,75 +1,55 @@
-import React, { useState } from 'react';
-import { router } from '@inertiajs/react';
+import React, { useEffect, useState } from 'react';
+import { router, usePage } from '@inertiajs/react';
 
-export default function Systeminformation({ onBack }) {
+export default function Systeminformation({ onBack, systemSettings }) {
+  const { flash, errors } = usePage().props;
+
   const [formData, setFormData] = useState({
-    sysName: 'ROTC Attendance System',
-    instName:
-      'Reserve Officers’ Training Corps - Central Luzon State University',
-    academicYear: '2026 - 2027',
-    contactEmail: 'rotc@gmail.com',
+    system_name: '',
+    institution_name: '',
+    academic_year: '',
+    contact_email: '',
   });
 
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (systemSettings) {
+      setFormData({
+        system_name: systemSettings.system_name || '',
+        institution_name: systemSettings.institution_name || '',
+        academic_year: systemSettings.academic_year || '',
+        contact_email: systemSettings.contact_email || '',
+      });
+    }
+  }, [systemSettings]);
 
   const handleChange = (e) => {
-    const { id, value } = e.target;
+    const { name, value } = e.target;
 
-    setFormData((prevData) => ({
-      ...prevData,
-      [id]: value,
+    setFormData((previous) => ({
+      ...previous,
+      [name]: value,
     }));
-
-    setMessage('');
-    setError('');
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     setSaving(true);
-    setMessage('');
-    setError('');
 
-    router.put(
-      '/system-settings',
-      {
-        system_name: formData.sysName,
-        institution_name: formData.instName,
-        academic_year: formData.academicYear,
-        contact_email: formData.contactEmail,
+    router.put('/system-settings', formData, {
+      preserveScroll: true,
+
+      onFinish: () => {
+        setSaving(false);
       },
-      {
-        preserveScroll: true,
-
-        onSuccess: () => {
-          setMessage('System information saved successfully.');
-        },
-
-        onError: (errors) => {
-          console.error(errors);
-          setError(
-            errors.contact_email ||
-              errors.system_name ||
-              errors.institution_name ||
-              errors.academic_year ||
-              'Unable to save system information.'
-          );
-        },
-
-        onFinish: () => {
-          setSaving(false);
-        },
-      }
-    );
+    });
   };
 
   return (
     <div className="system-info-container">
 
-      {/* Header Section */}
       <div className="system-info-header">
         <button
           className="profile-back-btn"
@@ -97,34 +77,35 @@ export default function Systeminformation({ onBack }) {
         </div>
       </div>
 
-      {/* Form Card */}
       <div className="system-info-card defcontainer">
 
-        {message && (
-          <div
-            style={{
-              marginBottom: '15px',
-              padding: '10px 15px',
-              borderRadius: '6px',
-              backgroundColor: '#e8f5e9',
-              color: '#325F38',
-            }}
-          >
-            {message}
+        {flash?.success && (
+          <div className="success-text">
+            {flash.success}
           </div>
         )}
 
-        {error && (
-          <div
-            style={{
-              marginBottom: '15px',
-              padding: '10px 15px',
-              borderRadius: '6px',
-              backgroundColor: '#ffebee',
-              color: '#c62828',
-            }}
-          >
-            {error}
+        {errors?.system_name && (
+          <div className="error-text">
+            {errors.system_name}
+          </div>
+        )}
+
+        {errors?.institution_name && (
+          <div className="error-text">
+            {errors.institution_name}
+          </div>
+        )}
+
+        {errors?.academic_year && (
+          <div className="error-text">
+            {errors.academic_year}
+          </div>
+        )}
+
+        {errors?.contact_email && (
+          <div className="error-text">
+            {errors.contact_email}
           </div>
         )}
 
@@ -133,67 +114,66 @@ export default function Systeminformation({ onBack }) {
           onSubmit={handleSubmit}
         >
 
-          {/* System Name */}
           <div className="sys-form-group">
-            <label htmlFor="sysName">
+            <label htmlFor="system_name">
               System Name
             </label>
 
             <input
               type="text"
-              id="sysName"
-              value={formData.sysName}
+              id="system_name"
+              name="system_name"
+              value={formData.system_name}
               onChange={handleChange}
               required
             />
           </div>
 
-          {/* Institution Name */}
           <div className="sys-form-group">
-            <label htmlFor="instName">
+            <label htmlFor="institution_name">
               Institution Name
             </label>
 
             <input
               type="text"
-              id="instName"
-              value={formData.instName}
+              id="institution_name"
+              name="institution_name"
+              value={formData.institution_name}
               onChange={handleChange}
               required
             />
           </div>
 
-          {/* Academic Year */}
           <div className="sys-form-group">
-            <label htmlFor="academicYear">
+            <label htmlFor="academic_year">
               Academic Year
             </label>
 
             <input
               type="text"
-              id="academicYear"
-              value={formData.academicYear}
+              id="academic_year"
+              name="academic_year"
+              value={formData.academic_year}
               onChange={handleChange}
               required
             />
           </div>
 
-          {/* Contact Email */}
           <div className="sys-form-group">
-            <label htmlFor="contactEmail">
+            <label htmlFor="contact_email">
               Contact Email
             </label>
 
             <input
               type="email"
-              id="contactEmail"
-              value={formData.contactEmail}
+              id="contact_email"
+              name="contact_email"
+              value={formData.contact_email}
               onChange={handleChange}
               required
             />
           </div>
 
-          {/* Save Button */}
           <button
             type="submit"
             className="sys-save-btn"

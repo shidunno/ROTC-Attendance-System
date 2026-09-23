@@ -8,6 +8,19 @@ use Inertia\Inertia;
 
 class SystemSettingController extends Controller
 {
+    private function getSettings(): SystemSetting
+    {
+        return SystemSetting::firstOrCreate(
+            ['id' => 1],
+            [
+                'system_name' => 'ROTC Attendance System',
+                'institution_name' => 'Reserve Officers’ Training Corps - Central Luzon State University',
+                'academic_year' => '2026 - 2027',
+                'contact_email' => 'rotc@gmail.com',
+            ]
+        );
+    }
+
     public function index()
     {
         abort_unless(
@@ -15,19 +28,8 @@ class SystemSettingController extends Controller
             403
         );
 
-        $settings = SystemSetting::first();
-
-        if (!$settings) {
-            $settings = SystemSetting::create([
-                'system_name' => 'ROTC Attendance System',
-                'institution_name' => 'Reserve Officers’ Training Corps - Central Luzon State University',
-                'academic_year' => '2026 - 2027',
-                'contact_email' => 'rotc@gmail.com',
-            ]);
-        }
-
         return Inertia::render('Setting', [
-            'systemSettings' => $settings,
+            'systemSettings' => $this->getSettings(),
         ]);
     }
 
@@ -39,17 +41,13 @@ class SystemSettingController extends Controller
         );
 
         $validated = $request->validate([
-            'system_name' => 'required|string|max:255',
-            'institution_name' => 'required|string|max:255',
-            'academic_year' => 'required|string|max:50',
-            'contact_email' => 'required|email|max:255',
+            'system_name' => ['required', 'string', 'max:255'],
+            'institution_name' => ['required', 'string', 'max:255'],
+            'academic_year' => ['required', 'string', 'max:50'],
+            'contact_email' => ['required', 'email', 'max:255'],
         ]);
 
-        $settings = SystemSetting::first();
-
-        if (!$settings) {
-            $settings = new SystemSetting();
-        }
+        $settings = $this->getSettings();
 
         $settings->system_name = $validated['system_name'];
         $settings->institution_name = $validated['institution_name'];

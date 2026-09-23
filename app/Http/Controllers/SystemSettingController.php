@@ -10,7 +10,15 @@ class SystemSettingController extends Controller
 {
     public function index()
     {
-        $settings = SystemSetting::first();
+        $settings = SystemSetting::firstOrCreate(
+            ['id' => 1],
+            [
+                'system_name' => 'ROTC Attendance System',
+                'institution_name' => '',
+                'academic_year' => '',
+                'contact_email' => '',
+            ]
+        );
 
         return Inertia::render('Setting', [
             'systemSettings' => $settings,

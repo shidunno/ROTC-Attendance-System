@@ -76,7 +76,7 @@ export default function Layout({children, pageTitle}) {
                 <div className = 'topbar'>
                     <h1>{pageTitle}</h1>
                         <div style = {{display: 'flex', gap: '0.5vw', justifyContent: 'center', alignItems: 'center'}}>
-                            <img src = {user?.profile_photo_path ? `/storage/${user.profile_photo_path}` : profileimg} alt="Profile"></img>
+                            <img src={user?.profile_photo_path ? `/storage/${user.profile_photo_path}?v=${user.updated_at || Date.now()}` : profileimg} alt="Profile"></img>
                             <div style = {{display: 'flex', flexDirection: 'column', lineHeight: '0.3rem', paddingTop: '1vw'}}>
                                 <h2 id = 'adminname'>{user?.name || 'User'}</h2>
                                 <p id = 'userrole'>{user?.role ? user.role.toUpperCase() : 'Guest'}</p>

@@ -2282,16 +2282,7 @@ rect:focus {
 }
 
 /* Delete Selected Button (Pinkish Red) */
-.btn-batch-delete {
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: #ffffff;
-    background-color: #e88b94;
-    border: none;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-}
+
 
 .btn-batch-delete:hover:not(:disabled) {
     background-color: #d87680;

@@ -39,23 +39,23 @@ export default function ProfileInformation({ onBack }) {
   };
 
     const handleSubmit = (e) => {
-    e.preventDefault();
+      e.preventDefault();
 
-    post('/profile/update', {
-      forceFormData: true,
-      preserveScroll: true,
+      post('/profile/update', {
+        forceFormData: true,
+        preserveScroll: true,
 
-      onSuccess: (page) => {
-        const updatedUser = page.props.auth?.user;
+        onSuccess: (page) => {
+          const updatedUser = page.props.auth?.user;
 
-        if (updatedUser?.profile_photo_path) {
-          setPhotoPreview(
-            `/storage/${updatedUser.profile_photo_path}?v=${Date.now()}`
-          );
-        }
-      },
-    });
-  };
+          if (updatedUser?.profile_photo_path) {
+            setPhotoPreview(
+              `/storage/${updatedUser.profile_photo_path}?v=${Date.now()}`
+            );
+          }
+        },
+      });
+    };
 
   return (
     <div className="profile-info-container">

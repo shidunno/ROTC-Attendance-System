@@ -195,13 +195,11 @@ Route::get('/Dashboard', function() {
     Route::post('/Usermanagement/batch-archive', [UserController::class, 'batchArchive'])->name('users.batchArchive');
     Route::patch('/users/assign-platoon', [UserController::class, 'assignPlatoon'])->name('users.assign-platoon');
 
-    Route::get('/Setting', function () {
-    return Inertia::render('Setting', [
-        'systemSettings' => app(SystemSettingController::class)->show(),
-    ]);
-    });
+    Route::get('/Setting', [SystemSettingController::class, 'index'])
+    ->name('settings.index');
 
-    Route::put('/system-settings', [SystemSettingController::class, 'update'])->name('system-settings.update');
+    Route::put('/system-settings', [SystemSettingController::class, 'update'])
+        ->name('system-settings.update');
     
     Route::post('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
 

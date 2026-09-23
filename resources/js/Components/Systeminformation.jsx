@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { router, usePage } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 
-export default function Systeminformation({ onBack, systemSettings }) {
-  const { flash, errors } = usePage().props;
-
+export default function Systeminformation({
+  onBack,
+  systemSettings,
+}) {
   const [formData, setFormData] = useState({
-    system_name: '',
-    institution_name: '',
-    academic_year: '',
-    contact_email: '',
+    sysName: '',
+    instName: '',
+    academicYear: '',
+    contactEmail: '',
   });
 
   const [saving, setSaving] = useState(false);
@@ -16,20 +17,20 @@ export default function Systeminformation({ onBack, systemSettings }) {
   useEffect(() => {
     if (systemSettings) {
       setFormData({
-        system_name: systemSettings.system_name || '',
-        institution_name: systemSettings.institution_name || '',
-        academic_year: systemSettings.academic_year || '',
-        contact_email: systemSettings.contact_email || '',
+        sysName: systemSettings.system_name || '',
+        instName: systemSettings.institution_name || '',
+        academicYear: systemSettings.academic_year || '',
+        contactEmail: systemSettings.contact_email || '',
       });
     }
   }, [systemSettings]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { id, value } = e.target;
 
     setFormData((previous) => ({
       ...previous,
-      [name]: value,
+      [id]: value,
     }));
   };
 
@@ -38,19 +39,29 @@ export default function Systeminformation({ onBack, systemSettings }) {
 
     setSaving(true);
 
-    router.put('/system-settings', formData, {
-      preserveScroll: true,
-
-      onFinish: () => {
-        setSaving(false);
+    router.put(
+      '/system-settings',
+      {
+        system_name: formData.sysName,
+        institution_name: formData.instName,
+        academic_year: formData.academicYear,
+        contact_email: formData.contactEmail,
       },
-    });
+      {
+        preserveScroll: true,
+
+        onFinish: () => {
+          setSaving(false);
+        },
+      }
+    );
   };
 
   return (
     <div className="system-info-container">
 
       <div className="system-info-header">
+
         <button
           className="profile-back-btn"
           type="button"
@@ -75,39 +86,10 @@ export default function Systeminformation({ onBack, systemSettings }) {
           <h1>System Information</h1>
           <p>Manage system and institution details</p>
         </div>
+
       </div>
 
       <div className="system-info-card defcontainer">
-
-        {flash?.success && (
-          <div className="success-text">
-            {flash.success}
-          </div>
-        )}
-
-        {errors?.system_name && (
-          <div className="error-text">
-            {errors.system_name}
-          </div>
-        )}
-
-        {errors?.institution_name && (
-          <div className="error-text">
-            {errors.institution_name}
-          </div>
-        )}
-
-        {errors?.academic_year && (
-          <div className="error-text">
-            {errors.academic_year}
-          </div>
-        )}
-
-        {errors?.contact_email && (
-          <div className="error-text">
-            {errors.contact_email}
-          </div>
-        )}
 
         <form
           className="system-info-form"
@@ -115,60 +97,56 @@ export default function Systeminformation({ onBack, systemSettings }) {
         >
 
           <div className="sys-form-group">
-            <label htmlFor="system_name">
+            <label htmlFor="sysName">
               System Name
             </label>
 
             <input
               type="text"
-              id="system_name"
-              name="system_name"
-              value={formData.system_name}
+              id="sysName"
+              value={formData.sysName}
               onChange={handleChange}
               required
             />
           </div>
 
           <div className="sys-form-group">
-            <label htmlFor="institution_name">
+            <label htmlFor="instName">
               Institution Name
             </label>
 
             <input
               type="text"
-              id="institution_name"
-              name="institution_name"
-              value={formData.institution_name}
+              id="instName"
+              value={formData.instName}
               onChange={handleChange}
               required
             />
           </div>
 
           <div className="sys-form-group">
-            <label htmlFor="academic_year">
+            <label htmlFor="academicYear">
               Academic Year
             </label>
 
             <input
               type="text"
-              id="academic_year"
-              name="academic_year"
-              value={formData.academic_year}
+              id="academicYear"
+              value={formData.academicYear}
               onChange={handleChange}
               required
             />
           </div>
 
           <div className="sys-form-group">
-            <label htmlFor="contact_email">
+            <label htmlFor="contactEmail">
               Contact Email
             </label>
 
             <input
               type="email"
-              id="contact_email"
-              name="contact_email"
-              value={formData.contact_email}
+              id="contactEmail"
+              value={formData.contactEmail}
               onChange={handleChange}
               required
             />

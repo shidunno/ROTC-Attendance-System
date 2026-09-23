@@ -1,3 +1,4 @@
+export default function Setting({ systemSettings }) {
 import Layout from "@/Layouts/AuthenticatedLayout";
 import Announcementprofileimg from '../assets/announcementprofileimg.svg';
 import Arrowimg from '../assets/arrowimg.svg';
@@ -36,7 +37,7 @@ export default function Setting() {
             ) : showChangePassword ? ( 
                 <Changepassword onBack={() => setShowChangePassword(false)} />
             ) : showSysteminformation ? (
-                <Systeminformation onBack={() => setShowSysteminformation(false)} />
+                <Systeminformation onBack={handleBack} systemSettings={systemSettings} />
             ) : showAttendancerules ? (
                 <Attendancerules onBack={() => setShowAttendancerules(false)} />
             ) : showAttendancestatus ? (

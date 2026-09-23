@@ -17,11 +17,20 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-public function index(Request $request)
+    public function index(Request $request)
     {
         $currentUser = $request->user();
 
-        $query = User::select('id', 'custom_id', 'name', 'role', 'email', 'status', 'profile_photo_path', 'platoon_id')
+        $query = User::select(
+            'id',
+            'custom_id',
+            'name',
+            'role',
+            'email',
+            'status',
+            'profile_photo_path',
+            'platoon_id'
+        )
             ->with('platoon')
             ->whereIn('role', ['cadet', 'leader']);
 
@@ -30,7 +39,7 @@ public function index(Request $request)
             $query->where('platoon_id', $currentUser->platoon_id);
         }
 
-        // 1. Search Filter (Supports names, IDs, and text like "Platoon 3" or "3")
+        // 1. Search Filter
         if ($request->filled('search')) {
             $search = $request->search;
             $digits = preg_replace('/[^0-9]/', '', $search);
@@ -41,7 +50,7 @@ public function index(Request $request)
                     ->orWhere('id', 'like', "%{$search}%")
                     ->orWhereHas('platoon', function ($platoonQuery) use ($search, $digits) {
                         $platoonQuery->where('name', 'like', "%{$search}%");
-                        
+
                         if (!empty($digits)) {
                             $platoonQuery->orWhere('number', $digits);
                         }
@@ -49,34 +58,48 @@ public function index(Request $request)
             });
         }
 
-        // 2. Role Filter ('cadet' or 'leader')
+        // 2. Role Filter
         if ($request->filled('role')) {
             $query->where('role', $request->role);
         }
 
-        // 3. Status Filter ('Active' or 'Archive')
+        // 3. Status Filter
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
         // Detect if coming from /Student or /Usermanagement
-        $component = $request->is('Student*') ? 'Cadets' : 'Usermanagement';
+        $component = $request->is('Student*')
+            ? 'Cadets'
+            : 'Usermanagement';
 
-        // Base query for counts matching the user's privilege scope
+        // Base query for counts
         $countQuery = User::whereIn('role', ['cadet', 'leader']);
+
         if ($currentUser && $currentUser->role === 'leader') {
-            $countQuery->where('platoon_id', $currentUser->platoon_id);
+            $countQuery->where(
+                'platoon_id',
+                $currentUser->platoon_id
+            );
         }
 
         return Inertia::render($component, [
-            'users'      => $query->latest()->get(),
-            'platoons'   => \App\Models\Platoon::all(),
-            'page'       => $request->input('page', 'Cadets'),
-            'filters'    => $request->only(['search', 'role', 'status']),
+            'users' => $query->latest()->get(),
+            'platoons' => \App\Models\Platoon::all(),
+            'page' => $request->input('page', 'Cadets'),
+            'filters' => $request->only([
+                'search',
+                'role',
+                'status'
+            ]),
             'userCounts' => [
-                'total'   => (clone $countQuery)->count(),
-                'active'  => (clone $countQuery)->where('status', 'Active')->count(),
-                'archive' => (clone $countQuery)->where('status', 'Archive')->count(),
+                'total' => (clone $countQuery)->count(),
+                'active' => (clone $countQuery)
+                    ->where('status', 'Active')
+                    ->count(),
+                'archive' => (clone $countQuery)
+                    ->where('status', 'Archive')
+                    ->count(),
             ],
         ]);
     }
@@ -104,15 +127,18 @@ public function index(Request $request)
     {
         $request->validate([
             'number' => 'required|integer|unique:platoons,number',
-            'name'   => 'nullable|string|max:255',
+            'name' => 'nullable|string|max:255',
         ]);
 
         \App\Models\Platoon::create([
             'number' => $request->number,
-            'name'   => $request->name,
+            'name' => $request->name,
         ]);
 
-        return back()->with('success', 'Platoon created successfully.');
+        return back()->with(
+            'success',
+            'Platoon created successfully.'
+        );
     }
 
     /**
@@ -142,9 +168,9 @@ public function index(Request $request)
             ->firstOrFail();
 
         $request->validate([
-            'name'   => 'required|string',
-            'role'   => 'required|in:cadet,leader',
-            'email'  => 'required|email',
+            'name' => 'required|string',
+            'role' => 'required|in:cadet,leader',
+            'email' => 'required|email',
             'status' => 'required|string',
         ]);
 
@@ -155,7 +181,7 @@ public function index(Request $request)
         $platoonId = $user->platoon_id;
         $year = date('Y');
 
-        // 1. Cadet → Leader custom ID logic (LDR-2026-XXXX)
+        // 1. Cadet → Leader custom ID logic
         if ($oldRole === 'cadet' && $newRole === 'leader') {
 
             $lastLeader = User::where('role', 'leader')
@@ -164,34 +190,48 @@ public function index(Request $request)
                 ->first();
 
             if ($lastLeader) {
-                $lastNumber = (int) substr($lastLeader->custom_id, -4);
+                $lastNumber = (int) substr(
+                    $lastLeader->custom_id,
+                    -4
+                );
+
                 $newNumber = $lastNumber + 1;
             } else {
                 $newNumber = 1;
             }
 
-            $customId = 'LDR-' . $year . '-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+            $customId = 'LDR-' .
+                $year .
+                '-' .
+                str_pad(
+                    $newNumber,
+                    4,
+                    '0',
+                    STR_PAD_LEFT
+                );
 
-            // Check if a platoon already points to this user as leader
-            $existingPlatoon = DB::table('platoons')->where('leader_id', $user->id)->first();
+            // Check if a platoon already points to this user
+            $existingPlatoon = DB::table('platoons')
+                ->where('leader_id', $user->id)
+                ->first();
 
             if ($existingPlatoon) {
                 $platoonId = $existingPlatoon->id;
             } else {
-                // Determine the next available platoon number
                 $maxNumber = DB::table('platoons')->max('number') ?? 0;
+
                 $nextPlatoonNumber = $maxNumber + 1;
 
-                // Insert a new platoon record linked to this user and get its ID
                 $platoonId = DB::table('platoons')->insertGetId([
-                    'number'     => $nextPlatoonNumber,
-                    'leader_id'  => $user->id,
+                    'number' => $nextPlatoonNumber,
+                    'leader_id' => $user->id,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
             }
-        } 
-        // 2. Leader → Cadet custom ID logic (CAD-2026-XXXX)
+        }
+
+        // 2. Leader → Cadet custom ID logic
         else if ($oldRole === 'leader' && $newRole === 'cadet') {
 
             $lastCadet = User::where('role', 'cadet')
@@ -200,29 +240,47 @@ public function index(Request $request)
                 ->first();
 
             if ($lastCadet) {
-                $lastNumber = (int) substr($lastCadet->custom_id, -4);
+                $lastNumber = (int) substr(
+                    $lastCadet->custom_id,
+                    -4
+                );
+
                 $newNumber = $lastNumber + 1;
             } else {
                 $newNumber = 1;
             }
 
-            $customId = 'CAD-' . $year . '-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+            $customId = 'CAD-' .
+                $year .
+                '-' .
+                str_pad(
+                    $newNumber,
+                    4,
+                    '0',
+                    STR_PAD_LEFT
+                );
 
-            // Delete the platoon entirely when the leader is demoted
-            DB::table('platoons')->where('leader_id', $user->id)->delete();
+            // Delete platoon when leader is demoted
+            DB::table('platoons')
+                ->where('leader_id', $user->id)
+                ->delete();
+
             $platoonId = null;
         }
 
         $user->update([
-            'custom_id'  => $customId,
-            'name'       => $request->name,
-            'role'       => $newRole,
-            'email'      => $request->email,
-            'status'     => $request->status,
+            'custom_id' => $customId,
+            'name' => $request->name,
+            'role' => $newRole,
+            'email' => $request->email,
+            'status' => $request->status,
             'platoon_id' => $platoonId,
         ]);
 
-        return back()->with('success', 'User updated successfully.');
+        return back()->with(
+            'success',
+            'User updated successfully.'
+        );
     }
 
     /**
@@ -230,14 +288,16 @@ public function index(Request $request)
      */
     public function destroy(string $id)
     {
-        // Finds user by database ID or custom_id
         $user = User::where('id', $id)
             ->orWhere('custom_id', $id)
             ->firstOrFail();
 
         $user->delete();
 
-        return back()->with('success', 'User deleted successfully.');
+        return back()->with(
+            'success',
+            'User deleted successfully.'
+        );
     }
 
     /**
@@ -253,7 +313,10 @@ public function index(Request $request)
             ->orWhereIn('custom_id', $request->ids)
             ->delete();
 
-        return back()->with('success', 'Selected users deleted successfully.');
+        return back()->with(
+            'success',
+            'Selected users deleted successfully.'
+        );
     }
 
     /**
@@ -266,63 +329,140 @@ public function index(Request $request)
         ]);
 
         User::whereIn('id', $request->ids)
-            ->orWhereIn('custom_id', $request->ids)
             ->update(['status' => 'Archive']);
 
-        return back()->with('success', 'Selected users archived successfully.');
+        return back()->with(
+            'success',
+            'Selected users archived successfully.'
+        );
     }
 
     public function import(Request $request)
     {
-        $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv'
+        ]);
 
         try {
-            Excel::import(new CadetsImport, $request->file('file'));
-            return back()->with('success', 'Cadets imported successfully!');
+            Excel::import(
+                new CadetsImport,
+                $request->file('file')
+            );
+
+            return back()->with(
+                'success',
+                'Cadets imported successfully!'
+            );
+
         } catch (ValidationException $e) {
+
             $errors = [];
 
             foreach ($e->failures() as $failure) {
-                $errors[] = "Row {$failure->row()}: " . implode(', ', $failure->errors());
+                $errors[] =
+                    "Row {$failure->row()}: " .
+                    implode(', ', $failure->errors());
             }
 
-            return back()->withErrors(['import' => $errors]);
+            return back()->withErrors([
+                'import' => $errors
+            ]);
         }
     }
 
+    /**
+     * Update authenticated user's profile.
+     */
     public function updateProfile(Request $request)
     {
         $user = $request->user();
-        $isAdmin = $user->role === 'admin';
+
+        if (!$user) {
+            return back()->withErrors([
+                'profile' => 'User is not authenticated.',
+            ]);
+        }
+
+        $isAdmin = strtolower(
+            (string) $user->role
+        ) === 'admin';
 
         $validated = $request->validate([
-            'name' => $isAdmin ? ['required', 'string', 'max:255'] : ['nullable'],
-            'email' => $isAdmin ? ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)] : ['nullable'],
-            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'name' => $isAdmin
+                ? [
+                    'required',
+                    'string',
+                    'max:255'
+                ]
+                : ['nullable'],
+
+            'email' => $isAdmin
+                ? [
+                    'required',
+                    'email',
+                    'max:255',
+                    Rule::unique('users')
+                        ->ignore($user->id),
+                ]
+                : ['nullable'],
+
+            'avatar' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png',
+                'max:2048',
+            ],
         ]);
 
+        /*
+        |--------------------------------------------------------------------------
+        | Update admin name and email
+        |--------------------------------------------------------------------------
+        */
+
         if ($isAdmin) {
-            $user->update([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-            ]);
+            $user->name = $validated['name'];
+            $user->email = $validated['email'];
+            $user->save();
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Update profile photo
+        |--------------------------------------------------------------------------
+        */
 
         if ($request->hasFile('avatar')) {
-            $path = $request->file('avatar')->store('avatars', 'public');
-            
-            $user->update([
-                'profile_photo_path' => $path,
-            ]);
+
+            $path = $request->file('avatar')
+                ->store('avatars', 'public');
+
+            $user->profile_photo_path = $path;
+
+            $user->save();
         }
 
-        return back()->with('success', 'Profile updated successfully.');
+        /*
+        |--------------------------------------------------------------------------
+        | Refresh model
+        |--------------------------------------------------------------------------
+        */
+
+        $user->refresh();
+
+        return back()->with(
+            'success',
+            'Profile updated successfully.'
+        );
     }
 
+    /**
+     * Assign users to a platoon.
+     */
     public function assignPlatoon(Request $request)
     {
         $request->validate([
-            'user_ids'   => 'required|array',
+            'user_ids' => 'required|array',
             'platoon_id' => 'required|exists:platoons,id',
         ]);
 
@@ -332,32 +472,48 @@ public function index(Request $request)
                 'platoon_id' => $request->platoon_id,
             ]);
 
-        return back()->with('success', 'Platoons assigned successfully.');
+        return back()->with(
+            'success',
+            'Platoons assigned successfully.'
+        );
     }
 
+    /**
+     * Change password.
+     */
     public function changePassword(Request $request)
-{
-    $user = $request->user();
+    {
+        $user = $request->user();
 
-    $validated = $request->validate([
-        'current_password' => ['required'],
-        'new_password' => ['required', 'string', 'min:6', 'confirmed'],
-    ]);
+        $validated = $request->validate([
+            'current_password' => ['required'],
+            'new_password' => [
+                'required',
+                'string',
+                'min:6',
+                'confirmed'
+            ],
+        ]);
 
-    if (!Hash::check($validated['current_password'], $user->password)) {
+        if (!Hash::check(
+            $validated['current_password'],
+            $user->password
+        )) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Current password is incorrect.',
+            ], 422);
+        }
+
+        $user->update([
+            'password' => Hash::make(
+                $validated['new_password']
+            ),
+        ]);
+
         return response()->json([
-            'success' => false,
-            'message' => 'Current password is incorrect.',
-        ], 422);
+            'success' => true,
+            'message' => 'Password successfully updated!',
+        ]);
     }
-
-    $user->update([
-        'password' => Hash::make($validated['new_password']),
-    ]);
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Password successfully updated!',
-    ]);
-}
 }

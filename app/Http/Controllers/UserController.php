@@ -11,6 +11,7 @@ use Inertia\Inertia;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -34,12 +35,10 @@ class UserController extends Controller
             ->with('platoon')
             ->whereIn('role', ['cadet', 'leader']);
 
-        // Restrict query if the user is a platoon leader
         if ($currentUser && $currentUser->role === 'leader') {
             $query->where('platoon_id', $currentUser->platoon_id);
         }
 
-        // 1. Search Filter
         if ($request->filled('search')) {
             $search = $request->search;
             $digits = preg_replace('/[^0-9]/', '', $search);
@@ -58,22 +57,18 @@ class UserController extends Controller
             });
         }
 
-        // 2. Role Filter
         if ($request->filled('role')) {
             $query->where('role', $request->role);
         }
 
-        // 3. Status Filter
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        // Detect if coming from /Student or /Usermanagement
         $component = $request->is('Student*')
             ? 'Cadets'
             : 'Usermanagement';
 
-        // Base query for counts
         $countQuery = User::whereIn('role', ['cadet', 'leader']);
 
         if ($currentUser && $currentUser->role === 'leader') {
@@ -162,7 +157,6 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        // Allows looking up by standard DB id or custom_id
         $user = User::where('id', $id)
             ->orWhere('custom_id', $id)
             ->firstOrFail();
@@ -181,7 +175,6 @@ class UserController extends Controller
         $platoonId = $user->platoon_id;
         $year = date('Y');
 
-        // 1. Cadet → Leader custom ID logic
         if ($oldRole === 'cadet' && $newRole === 'leader') {
 
             $lastLeader = User::where('role', 'leader')
@@ -210,7 +203,6 @@ class UserController extends Controller
                     STR_PAD_LEFT
                 );
 
-            // Check if a platoon already points to this user
             $existingPlatoon = DB::table('platoons')
                 ->where('leader_id', $user->id)
                 ->first();
@@ -231,7 +223,6 @@ class UserController extends Controller
             }
         }
 
-        // 2. Leader → Cadet custom ID logic
         else if ($oldRole === 'leader' && $newRole === 'cadet') {
 
             $lastCadet = User::where('role', 'cadet')
@@ -260,7 +251,6 @@ class UserController extends Controller
                     STR_PAD_LEFT
                 );
 
-            // Delete platoon when leader is demoted
             DB::table('platoons')
                 ->where('leader_id', $user->id)
                 ->delete();
@@ -329,7 +319,10 @@ class UserController extends Controller
         ]);
 
         User::whereIn('id', $request->ids)
-            ->update(['status' => 'Archive']);
+            ->orWhereIn('custom_id', $request->ids)
+            ->update([
+                'status' => 'Archive'
+            ]);
 
         return back()->with(
             'success',
@@ -337,6 +330,9 @@ class UserController extends Controller
         );
     }
 
+    /**
+     * Import cadets.
+     */
     public function import(Request $request)
     {
         $request->validate([
@@ -344,6 +340,7 @@ class UserController extends Controller
         ]);
 
         try {
+
             Excel::import(
                 new CadetsImport,
                 $request->file('file')
@@ -416,14 +413,13 @@ class UserController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Update admin name and email
+        | Update name and email
         |--------------------------------------------------------------------------
         */
 
         if ($isAdmin) {
             $user->name = $validated['name'];
             $user->email = $validated['email'];
-            $user->save();
         }
 
         /*
@@ -434,19 +430,26 @@ class UserController extends Controller
 
         if ($request->hasFile('avatar')) {
 
-            $path = $request->file('avatar')
-                ->store('avatars', 'public');
+            $file = $request->file('avatar');
+
+            $filename =
+                'avatar_' .
+                $user->id .
+                '_' .
+                time() .
+                '.' .
+                $file->getClientOriginalExtension();
+
+            $path = $file->storeAs(
+                'avatars',
+                $filename,
+                'public'
+            );
 
             $user->profile_photo_path = $path;
-
-            $user->save();
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Refresh model
-        |--------------------------------------------------------------------------
-        */
+        $user->save();
 
         $user->refresh();
 

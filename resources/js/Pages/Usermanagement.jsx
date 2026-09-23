@@ -44,13 +44,6 @@ export default function Usermanagement({ users = [], platoons = [], userCounts }
         router.put(`/Usermanagement/${userData.id}`, userData, { preserveScroll: true });
     };
 
-    const handleDeleteUser = (userId) => {
-        router.delete(`/Usermanagement/${userId}`, { preserveScroll: true });
-    };
-
-    const handleBatchDelete = (userIds) => {
-        router.post('/Usermanagement/batch-delete', { ids: userIds }, { preserveScroll: true });
-    };
 
     const handleBatchArchive = (userIds) => {
         router.post('/Usermanagement/batch-archive', { ids: userIds }, { preserveScroll: true });
@@ -89,8 +82,6 @@ export default function Usermanagement({ users = [], platoons = [], userCounts }
                     platoons={platoons}
                     currentUser={currentUser}
                     onUpdateUser={handleUpdateUser}
-                    onDeleteUser={handleDeleteUser}
-                    onBatchDelete={handleBatchDelete}
                     onBatchArchive={handleBatchArchive}
                     onStorePlatoon={handleStorePlatoon}
                     onAssignPlatoon={handleAssignPlatoon}

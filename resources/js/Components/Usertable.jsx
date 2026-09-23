@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import Editimg from '../assets/editimg.svg';
 
-export default function Usertable({ users = [], onUpdateUser, onDeleteUser, onBatchDelete, onBatchArchive, platoons = [], onAssignPlatoon, currentUser }) {
+export default function Usertable({ users = [], onUpdateUser, onBatchArchive, platoons = [], onAssignPlatoon, currentUser }) {
     // Determine if the current user is an admin
     const isAdmin = currentUser?.role ? currentUser.role.toLowerCase() === 'admin' : true;
 
@@ -80,18 +80,7 @@ export default function Usertable({ users = [], onUpdateUser, onDeleteUser, onBa
     const isAllCurrentSelected = 
         currentUsers.length > 0 && 
         currentUsers.every((user) => selectedUserIds.includes(user.id || user.custom_id));
-
-    // Batch Action Handlers
-    const handleBatchDelete = () => {
-        if (selectedUserIds.length === 0) return;
-        
-        if (window.confirm(`Are you sure you want to delete ${selectedUserIds.length} selected user(s)?`)) {
-            if (onBatchDelete) {
-                onBatchDelete(selectedUserIds);
-            }
-            setSelectedUserIds([]);
-        }
-    };
+    
 
     const handleBatchArchive = () => {
         if (selectedUserIds.length === 0) return;
@@ -174,16 +163,6 @@ export default function Usertable({ users = [], onUpdateUser, onDeleteUser, onBa
             });
         }
         handleCloseModal();
-    };
-
-    const handleDelete = () => {
-        const targetId = formData.id || formData.custom_id;
-        if (window.confirm(`Are you sure you want to delete ${formData.name}?`)) {
-            if (onDeleteUser) {
-                onDeleteUser(targetId);
-            }
-            handleCloseModal();
-        }
     };
 
     return (
@@ -281,15 +260,6 @@ export default function Usertable({ users = [], onUpdateUser, onDeleteUser, onBa
                             disabled={selectedUserIds.length === 0}
                         >
                             Archive Selected {selectedUserIds.length > 0 && `(${selectedUserIds.length})`}
-                        </button>
-
-                        <button
-                            type="button"
-                            className="btn-batch-delete"
-                            onClick={handleBatchDelete}
-                            disabled={selectedUserIds.length === 0}
-                        >
-                            Delete Selected {selectedUserIds.length > 0 && `(${selectedUserIds.length})`}
                         </button>
                     </div>
                 )}
@@ -392,13 +362,6 @@ export default function Usertable({ users = [], onUpdateUser, onDeleteUser, onBa
                                 >
                                     Cancel
                                 </button>
-                                <button
-                                    type="submit"
-                                    className="edit-user-btn-save"
-                                    disabled={!selectedPlatoonId}
-                                >
-                                    Confirm Assignment
-                                </button>
                             </div>
                         </form>
                     </div>
@@ -468,13 +431,6 @@ export default function Usertable({ users = [], onUpdateUser, onDeleteUser, onBa
                             </div>
 
                             <div className="edit-user-modal-actions">
-                                <button
-                                    type="button"
-                                    className="edit-user-btn-delete"
-                                    onClick={handleDelete}
-                                >
-                                    Delete User
-                                </button>
                                 <button
                                     type="submit"
                                     className="edit-user-btn-save"

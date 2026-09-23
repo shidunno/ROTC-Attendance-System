@@ -66,29 +66,19 @@ export default function ProfileInformation({ onBack }) {
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
         </button>
-
         <div className="profile-title-group">
           <h1>Profile Information</h1>
-          <p>
-            {isAdmin
-              ? 'Update user details and display photo'
-              : 'Update your display photo'}
-          </p>
+          <p>{isAdmin ? 'Update user details and display photo' : 'Update your display photo'}</p>
         </div>
       </div>
 
       {/* Form Card */}
       <form className="profile-info-card" onSubmit={handleSubmit}>
-        
         {/* Avatar / Photo Upload Section */}
         <div className="profile-photo-section">
           <div className="profile-avatar-wrapper">
             {photoPreview ? (
-              <img
-                src={photoPreview}
-                alt="Profile Avatar"
-                className="profile-avatar-img"
-              />
+              <img src={photoPreview} alt="Profile Avatar" className="profile-avatar-img" />
             ) : (
               <svg 
                 className="profile-avatar-placeholder" 
@@ -99,22 +89,14 @@ export default function ProfileInformation({ onBack }) {
               >
                 <circle cx="50" cy="50" r="50" />
                 <circle cx="50" cy="35" r="18" fill="#ffffff" />
-                <path
-                  d="M 16 82 C 16 62, 30 52, 50 52 C 70 52, 84 62, 84 82 Z"
-                  fill="#ffffff"
-                />
+                <path d="M 16 82 C 16 62, 30 52, 50 52 C 70 52, 84 62, 84 82 Z" fill="#ffffff" />
               </svg>
             )}
           </div>
 
-          <label
-            htmlFor="photo-upload"
-            className="profile-change-photo-btn"
-            style={{ cursor: 'pointer' }}
-          >
+          <label htmlFor="photo-upload" className="profile-change-photo-btn" style={{ cursor: 'pointer' }}>
             Change Photo
           </label>
-
           <input
             type="file"
             id="photo-upload"
@@ -122,16 +104,12 @@ export default function ProfileInformation({ onBack }) {
             onChange={handlePhotoChange}
             style={{ display: 'none' }}
           />
-
-          {errors.avatar && (
-            <span className="error-text">{errors.avatar}</span>
-          )}
+          {errors.avatar && <span className="error-text">{errors.avatar}</span>}
         </div>
 
         {/* Input Fields */}
         <div className="profile-field-group">
           <label htmlFor="name">Full Name</label>
-
           <input
             type="text"
             id="name"
@@ -140,15 +118,11 @@ export default function ProfileInformation({ onBack }) {
             onChange={handleChange}
             readOnly={!isAdmin}
           />
-
-          {errors.name && (
-            <span className="error-text">{errors.name}</span>
-          )}
+          {errors.name && <span className="error-text">{errors.name}</span>}
         </div>
 
         <div className="profile-field-group">
           <label htmlFor="email">Email Address</label>
-
           <input
             type="email"
             id="email"
@@ -157,10 +131,7 @@ export default function ProfileInformation({ onBack }) {
             onChange={handleChange}
             readOnly={!isAdmin}
           />
-
-          {errors.email && (
-            <span className="error-text">{errors.email}</span>
-          )}
+          {errors.email && <span className="error-text">{errors.email}</span>}
         </div>
 
         {/* Save Button for Everyone */}

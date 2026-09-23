@@ -346,6 +346,9 @@ class UserController extends Controller
 
         $user->save();
 
+        // Refresh the model so Inertia receives the newly saved value.
+        $user->refresh();
+
         return back()->with('success', 'Profile updated successfully.');
     }
 

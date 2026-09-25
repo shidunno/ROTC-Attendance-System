@@ -400,16 +400,7 @@ export default function Usertable({
                                 `(${selectedUserIds.length})`}
                         </button>
 
-                        <button
-                            type="button"
-                            className="btn-batch-delete"
-                            onClick={handleBatchDelete}
-                            disabled={selectedUserIds.length === 0}
-                        >
-                            Delete Selected{' '}
-                            {selectedUserIds.length > 0 &&
-                                `(${selectedUserIds.length})`}
-                        </button>
+                        
 
                         <button
                             type="button"
@@ -418,6 +409,17 @@ export default function Usertable({
                             disabled={selectedUserIds.length === 0}
                         >
                             Archive Selected{' '}
+                            {selectedUserIds.length > 0 &&
+                                `(${selectedUserIds.length})`}
+                        </button>
+
+                        <button
+                            type="button"
+                            className="btn-batch-delete"
+                            onClick={handleBatchDelete}
+                            disabled={selectedUserIds.length === 0}
+                        >
+                            Delete Selected{' '}
                             {selectedUserIds.length > 0 &&
                                 `(${selectedUserIds.length})`}
                         </button>

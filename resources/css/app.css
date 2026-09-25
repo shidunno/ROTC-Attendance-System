@@ -2286,11 +2286,16 @@ rect:focus {
     padding: 0.5rem 1rem;
     font-size: 0.85rem;
     font-weight: 500;
-    color: #ffffff;
-    background-color: #e74c3c;
-    border: none;
+    color: #a0a0a0;
+    background-color: #f2f2f2;
+    border: 1px solid #e0e0e0;
     border-radius: 6px;
     transition: all 0.2s ease;
+}
+
+.btn-batch-delete:hover:not(:disabled) {
+    background-color: #e5e5e5;
+    color: #555555;
 }
 
 /* Style the native select inside .rolefilter */

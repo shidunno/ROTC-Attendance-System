@@ -190,9 +190,11 @@ Route::get('/Dashboard', function() {
 
     Route::get('/Usermanagement', [UserController::class, 'index']);
     Route::put('/Usermanagement/{id}', [UserController::class, 'update']);
+    Route::post('/Usermanagement/batch-archive', [UserController::class, 'batchArchive'])->name('users.batchArchive');
+
     Route::delete('/Usermanagement/{id}', [UserController::class, 'destroy'])->name('users.destroy');
     Route::post('/Usermanagement/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');
-    Route::post('/Usermanagement/batch-archive', [UserController::class, 'batchArchive'])->name('users.batchArchive');
+
     Route::patch('/users/assign-platoon', [UserController::class, 'assignPlatoon'])->name('users.assign-platoon');
 
     Route::get('/Setting', [SystemSettingController::class, 'index'])

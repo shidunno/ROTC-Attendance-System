@@ -239,6 +239,36 @@ class UserController extends Controller
     }
 
     /**
+     * Delete a user.
+     */
+    public function destroy($id)
+    {
+        $user = User::where('id', $id)
+            ->orWhere('custom_id', $id)
+            ->firstOrFail();
+
+        $user->delete();
+
+        return back()->with('success', 'User deleted successfully.');
+    }
+
+    /**
+     * Delete multiple selected users.
+     */
+    public function batchDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+        ]);
+
+        User::whereIn('id', $request->ids)
+            ->orWhereIn('custom_id', $request->ids)
+            ->delete();
+
+        return back()->with('success', 'Selected users deleted successfully.');
+    }
+
+    /**
      * Archive multiple selected users.
      */
     public function batchArchive(Request $request)

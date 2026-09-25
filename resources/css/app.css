@@ -2281,7 +2281,51 @@ rect:focus {
     color: #555555;
 }
 
-/* Delete Selected Button (Pinkish Red) */
+/* Batch Delete Button */
+.btn-batch-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 40px;
+}
+
+.btn-batch-delete:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.btn-batch-delete:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+/* Delete User Button */
+.edit-user-btn-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 40px;
+}
+
+.edit-user-btn-delete:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
 
 
 .btn-batch-delete:hover:not(:disabled) {

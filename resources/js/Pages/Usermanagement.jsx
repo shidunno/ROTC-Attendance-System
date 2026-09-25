@@ -65,6 +65,14 @@ export default function Usermanagement({ users = [], platoons = [], userCounts }
         });
     };
 
+    const handleDeleteUser = (userId) => {
+        router.delete(`/Usermanagement/${userId}`, { preserveScroll: true });
+    };
+
+    const handleBatchDelete = (userIds) => {
+        router.post('/Usermanagement/batch-delete', { ids: userIds }, { preserveScroll: true });
+    };
+
     return (
         <Layout pageTitle={'Users'}>
             <div className="usermanagementmain">
@@ -83,6 +91,8 @@ export default function Usermanagement({ users = [], platoons = [], userCounts }
                     currentUser={currentUser}
                     onUpdateUser={handleUpdateUser}
                     onBatchArchive={handleBatchArchive}
+                    onDeleteUser={handleDeleteUser}
+                    onBatchDelete={handleBatchDelete}
                     onStorePlatoon={handleStorePlatoon}
                     onAssignPlatoon={handleAssignPlatoon}
                 />

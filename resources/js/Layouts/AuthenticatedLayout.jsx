@@ -3,6 +3,7 @@ import Sidebar from '../Components/Sidebar'
 import Dropdownimg from '../assets/dropdownimg.svg'
 import { useState } from 'react';
 import { Link, router, usePage } from '@inertiajs/react';
+import RotcChatbot from '../Components/RotcChatbot'
 
 export default function Layout({children, pageTitle}) {
 
@@ -97,7 +98,15 @@ export default function Layout({children, pageTitle}) {
                 </div>
             </div>
         </div>
+
+        {user &&
+            ['cadet', 'leader'].includes(
+                String(user.role).toLowerCase()
+            ) && <RotcChatbot />}
+
         </>
+
+
     );
 
 }

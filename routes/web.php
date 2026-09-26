@@ -12,6 +12,7 @@ use App\Models\Announcement;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\ExcuseLetterController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\RotcChatbotController;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -158,6 +159,13 @@ Route::get('/Dashboard', function() {
     ]);
 
 });
+
+    // ROTC Chatbot
+    Route::get('/api/rotc-chatbot/context', [RotcChatbotController::class, 'context'])
+    ->name('rotc-chatbot.context');
+
+    Route::post('/api/rotc-chatbot/message', [RotcChatbotController::class, 'message'])
+        ->name('rotc-chatbot.message');
 
     // Announcement Routes
     Route::get('/Announcement', [AnnouncementController::class, 'index'])->name('announcement.index');

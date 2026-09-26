@@ -284,24 +284,62 @@ class UserController extends Controller
         return back()->with('success', 'Selected users archived successfully.');
     }
 
-    public function import(Request $request)
+   public function import(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv'
+            'file' => 'required|mimes:xlsx,xls,csv',
         ]);
 
         try {
-            Excel::import(new CadetsImport, $request->file('file'));
+            $import = new CadetsImport();
 
-            return back()->with('success', 'Cadets imported successfully!');
+            Excel::import(
+                $import,
+                $request->file('file')
+            );
+
+            $errors = $import->getErrors();
+
+            if (!empty($errors)) {
+                $messages = [
+                    'Import completed with problems.',
+                ];
+
+                foreach ($errors as $error) {
+                    $messages[] = $error;
+                }
+
+                return back()->withErrors([
+                    'import' => $messages,
+                ]);
+            }
+
+            return back()->with(
+                'success',
+                'Cadets imported successfully!'
+            );
+
         } catch (ValidationException $e) {
             $errors = [];
 
             foreach ($e->failures() as $failure) {
-                $errors[] = "Row {$failure->row()}: " . implode(', ', $failure->errors());
+                $errors[] =
+                    "Row {$failure->row()}: " .
+                    implode(', ', $failure->errors());
             }
 
-            return back()->withErrors(['import' => $errors]);
+            return back()->withErrors([
+                'import' => $errors,
+            ]);
+
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->withErrors([
+                'import' => [
+                    'The Excel file could not be imported. Please check the file and try again.',
+                ],
+            ]);
         }
     }
 

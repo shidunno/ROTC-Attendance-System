@@ -6,6 +6,7 @@ use App\Models\Announcement;
 use App\Models\Attendance;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class RotcChatbotDataService
 {
@@ -52,7 +53,7 @@ class RotcChatbotDataService
                 'remarks',
             ]);
 
-        return [
+        return [    
             'total' => $records->count(),
 
             'present' => $records->filter(
@@ -157,6 +158,10 @@ class RotcChatbotDataService
 
     protected function getAttendanceRules(): ?array
     {
+        if (!Schema::hasTable('attendance_rules')) {
+            return null;
+        }
+
         $rules = DB::table('attendance_rules')
             ->latest('updated_at')
             ->first();

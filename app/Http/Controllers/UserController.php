@@ -287,32 +287,14 @@ class UserController extends Controller
    public function import(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv',
+            'file' => 'required|mimes:xlsx,xls,csv'
         ]);
 
         try {
-            $import = new CadetsImport();
-
             Excel::import(
-                $import,
+                new CadetsImport,
                 $request->file('file')
             );
-
-            $errors = $import->getErrors();
-
-            if (!empty($errors)) {
-                $messages = [
-                    'Import completed with problems.',
-                ];
-
-                foreach ($errors as $error) {
-                    $messages[] = $error;
-                }
-
-                return back()->withErrors([
-                    'import' => $messages,
-                ]);
-            }
 
             return back()->with(
                 'success',
@@ -329,16 +311,7 @@ class UserController extends Controller
             }
 
             return back()->withErrors([
-                'import' => $errors,
-            ]);
-
-        } catch (\Throwable $e) {
-            report($e);
-
-            return back()->withErrors([
-                'import' => [
-                    'The Excel file could not be imported. Please check the file and try again.',
-                ],
+                'import' => $errors
             ]);
         }
     }

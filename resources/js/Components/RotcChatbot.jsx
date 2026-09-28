@@ -38,6 +38,7 @@ export default function RotcChatbot() {
         try {
             const response = await fetch("/api/rotc-chatbot/message", {
                 method: "POST",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
                     Accept: "application/json",

@@ -167,6 +167,7 @@ Route::get('/Dashboard', function() {
     Route::post('/api/rotc-chatbot/message', [RotcChatbotController::class, 'message'])
         ->name('rotc-chatbot.message');
 
+        
     // Announcement Routes
     Route::get('/Announcement', [AnnouncementController::class, 'index'])->name('announcement.index');
     Route::post('/Announcement', [AnnouncementController::class, 'store'])->name('announcement.store');

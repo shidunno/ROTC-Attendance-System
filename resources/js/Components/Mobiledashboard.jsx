@@ -24,6 +24,12 @@ export default function Mobiledashboard({ user }) {
         );
     }
 
+    if (currentView === "chatbot") {
+    return (
+        <RotcChatbot />
+    );
+}
+
     return (
         <Layout pageTitle={"Dashboard"}>
             <div className="cadet-dashboard-container">

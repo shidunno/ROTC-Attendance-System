@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\OpenAiRotcChatbotService;
+use App\Services\RotcChatbotDataService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -10,18 +11,16 @@ use Illuminate\Support\Facades\Validator;
 class RotcChatbotController extends Controller
 {
     public function __construct(
-        private readonly RotcChatbotService $chatbot
+        private readonly RotcChatbotDataService $dataService,
+        private readonly OpenAiRotcChatbotService $chatbot
     ) {
     }
 
     /**
-     * POST /chatbot
+     * GET /api/rotc-chatbot/context
      */
-    public function chat(Request $request): JsonResponse
+    public function context(Request $request): JsonResponse
     {
-        /*
-         * Laravel authentication must determine the user.
-         */
         $user = $request->user();
 
         if (!$user) {
@@ -30,11 +29,24 @@ class RotcChatbotController extends Controller
             ], 401);
         }
 
-        /*
-         * Backend role authorization.
-         *
-         * Admin and all other roles are rejected.
-         */
+        return response()->json([
+            'context' => $this->dataService->getAuthorizedContext($user),
+        ]);
+    }
+
+    /**
+     * POST /api/rotc-chatbot/message
+     */
+    public function message(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Unauthenticated.',
+            ], 401);
+        }
+
         $role = strtolower((string) ($user->role ?? ''));
 
         if (!in_array($role, ['cadet', 'leader'], true)) {
@@ -43,9 +55,6 @@ class RotcChatbotController extends Controller
             ], 403);
         }
 
-        /*
-         * Validate the incoming message.
-         */
         $validator = Validator::make(
             $request->all(),
             [
@@ -74,10 +83,6 @@ class RotcChatbotController extends Controller
                 'message' => $answer,
             ]);
         } catch (\Throwable $e) {
-            /*
-             * Do not expose exception details, SQL, paths,
-             * environment variables, or credentials.
-             */
             report($e);
 
             return response()->json([

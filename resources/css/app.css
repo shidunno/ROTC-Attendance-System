@@ -4257,35 +4257,48 @@ rect:focus {
     }
 
     /* =========================================================
-   ROTC CHATBOT FLOATING OVERLAY
+   ROTC CHATBOT OVERLAY
    ========================================================= */
+
+    .rotc-chatbot-backdrop {
+        position: fixed;
+        inset: 0;
+
+        background: rgba(0, 0, 0, 0.52);
+
+        z-index: 99998;
+    }
+
+
+    /* =========================================================
+    CHAT PANEL
+    ========================================================= */
 
     .rotc-chatbot-panel {
         position: fixed;
-        right: 24px;
-        bottom: 92px;
 
-        width: 400px;
-        max-width: calc(100vw - 32px);
+        top: 86px;
+        right: 66px;
 
-        height: 590px;
-        max-height: calc(100vh - 128px);
-        min-height: 420px;
+        width: 460px;
+        height: 670px;
+
+        max-width: calc(100vw - 100px);
+        max-height: calc(100vh - 130px);
 
         display: flex;
         flex-direction: column;
 
         background: #ffffff;
 
-        border: 1px solid rgba(50, 95, 56, 0.15);
-        border-radius: 20px;
+        border-radius: 26px;
 
         overflow: hidden;
 
         box-shadow:
-            0 20px 55px rgba(0, 0, 0, 0.22);
+            0 20px 60px rgba(0, 0, 0, 0.30);
 
-        z-index: 100000;
+        z-index: 99999;
     }
 
 
@@ -4294,49 +4307,66 @@ rect:focus {
     ========================================================= */
 
     .rotc-chatbot-header {
-        min-height: 72px;
+        height: 82px;
 
         display: flex;
         align-items: center;
         justify-content: space-between;
 
-        padding: 13px 16px 13px 20px;
+        padding: 0 24px;
 
-        background: #325F38;
+        background: #34713d;
+
         color: #ffffff;
 
         flex-shrink: 0;
     }
 
-    .rotc-chatbot-header-content {
-        min-width: 0;
+    .rotc-chatbot-header-left {
+        display: flex;
+        align-items: center;
+
+        gap: 14px;
+    }
+
+    .rotc-chatbot-avatar {
+        width: 48px;
+        height: 48px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background: #ffffff;
+
+        border-radius: 50%;
+
+        font-size: 25px;
+
+        box-shadow:
+            0 2px 8px rgba(0, 0, 0, 0.12);
     }
 
     .rotc-chatbot-title {
-        font-size: 16px;
+        font-size: 19px;
         font-weight: 700;
-        line-height: 1.25;
+
+        line-height: 1.2;
+
         color: #ffffff;
     }
 
     .rotc-chatbot-status {
-        margin-top: 3px;
+        margin-top: 5px;
 
-        font-size: 12px;
-        line-height: 1.2;
+        font-size: 14px;
 
         color: #ffffff;
-        opacity: 0.86;
     }
 
-
-    /* =========================================================
-    CLOSE BUTTON
-    ========================================================= */
-
     .rotc-chatbot-close {
-        width: 36px;
-        height: 36px;
+        width: 42px;
+        height: 42px;
 
         display: flex;
         align-items: center;
@@ -4348,90 +4378,107 @@ rect:focus {
         border-radius: 50%;
 
         background: transparent;
+
         color: #ffffff;
 
-        font-size: 28px;
+        font-size: 38px;
         font-weight: 300;
 
         line-height: 1;
 
         cursor: pointer;
-
-        transition:
-            background-color 0.2s ease,
-            transform 0.2s ease;
     }
 
     .rotc-chatbot-close:hover {
         background: rgba(255, 255, 255, 0.15);
-        transform: scale(1.05);
     }
 
 
     /* =========================================================
-    CHAT AREA
+    MESSAGES
     ========================================================= */
 
     .rotc-chatbot-messages {
         flex: 1;
+
         min-height: 0;
+
+        padding: 28px 24px;
+
+        overflow-y: auto;
+
+        background: #ffffff;
 
         display: flex;
         flex-direction: column;
 
-        gap: 10px;
+        gap: 18px;
+    }
 
-        padding: 16px;
+    .rotc-chatbot-row {
+        display: flex;
 
-        overflow-y: auto;
+        align-items: flex-start;
 
-        background: #f7faf7;
+        gap: 12px;
+    }
 
-        -webkit-overflow-scrolling: touch;
+    .rotc-chatbot-row-user {
+        justify-content: flex-end;
+    }
+
+    .rotc-message-avatar {
+        width: 38px;
+        height: 38px;
+
+        flex: 0 0 38px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background: #f0f4f1;
+
+        border-radius: 50%;
+
+        font-size: 19px;
     }
 
 
     /* =========================================================
-    CHAT BUBBLES
+    MESSAGE BUBBLES
     ========================================================= */
 
     .rotc-chatbot-message {
-        max-width: 84%;
+        max-width: 76%;
 
-        padding: 10px 13px;
+        padding: 14px 18px;
 
-        border-radius: 16px;
+        border-radius: 18px;
 
-        font-size: 14px;
-        line-height: 1.45;
+        font-size: 16px;
+
+        line-height: 1.5;
 
         white-space: pre-wrap;
+
         overflow-wrap: anywhere;
     }
 
     .rotc-chatbot-message-assistant {
-        align-self: flex-start;
+        background: #f1f2f4;
 
-        background: #ffffff;
-        color: #25352a;
+        color: #202520;
 
-        border: 1px solid #dce8de;
-
-        border-bottom-left-radius: 5px;
-
-        box-shadow:
-            0 2px 8px rgba(50, 95, 56, 0.05);
+        border-top-left-radius: 6px;
     }
 
     .rotc-chatbot-message-user {
-        align-self: flex-end;
+        background: #34713d;
 
-        background: #467646;
         color: #ffffff;
 
-        border: 1px solid #467646;
-
-        border-bottom-right-radius: 5px;
+        border-top-right-radius: 6px;
     }
 
 
@@ -4440,11 +4487,12 @@ rect:focus {
     ========================================================= */
 
     .rotc-chatbot-error {
-        padding: 10px 12px;
+        padding: 12px 14px;
 
-        border-radius: 10px;
+        border-radius: 12px;
 
         background: #fef2f2;
+
         color: #991b1b;
 
         font-size: 13px;
@@ -4457,54 +4505,60 @@ rect:focus {
 
     .rotc-chatbot-input-area {
         display: flex;
-        align-items: flex-end;
+        align-items: center;
 
-        gap: 8px;
+        gap: 12px;
 
-        padding: 11px 12px;
-
-        border-top: 1px solid #e2e9e3;
+        padding: 18px 24px 22px;
 
         background: #ffffff;
+
+        border-top: 1px solid #eeeeee;
 
         flex-shrink: 0;
     }
 
     .rotc-chatbot-input-area textarea {
         flex: 1;
+
         min-width: 0;
 
-        min-height: 42px;
-        max-height: 100px;
+        height: 56px;
+
+        max-height: 120px;
 
         resize: none;
 
-        padding: 10px 13px;
+        padding: 17px 20px;
 
-        border: 1px solid #cbd8cd;
-        border-radius: 21px;
+        border: 1px solid #e0e4e1;
+
+        border-radius: 30px;
 
         outline: none;
 
-        font-family: inherit;
-        font-size: 14px;
-        line-height: 20px;
-
         background: #ffffff;
-        color: #25352a;
+
+        color: #222222;
+
+        font-family: inherit;
+
+        font-size: 15px;
+
+        line-height: 20px;
 
         box-sizing: border-box;
     }
 
     .rotc-chatbot-input-area textarea::placeholder {
-        color: #849286;
+        color: #8a8f8b;
     }
 
     .rotc-chatbot-input-area textarea:focus {
-        border-color: #467646;
+        border-color: #34713d;
 
         box-shadow:
-            0 0 0 2px rgba(70, 118, 70, 0.10);
+            0 0 0 2px rgba(52, 113, 61, 0.10);
     }
 
 
@@ -4513,89 +4567,90 @@ rect:focus {
     ========================================================= */
 
     .rotc-chatbot-input-area button {
-        width: 42px;
-        height: 42px;
+        width: 56px;
+        height: 56px;
 
-        flex: 0 0 42px;
+        flex: 0 0 56px;
 
         display: flex;
         align-items: center;
         justify-content: center;
 
-        padding: 0;
-
         border: none;
+
         border-radius: 50%;
 
-        background: #467646;
+        background: #34713d;
+
         color: #ffffff;
+
+        font-size: 22px;
 
         cursor: pointer;
 
-        font-size: 17px;
-
-        line-height: 1;
-
         box-shadow:
-            0 4px 12px rgba(50, 95, 56, 0.18);
+            0 5px 15px rgba(52, 113, 61, 0.25);
 
         transition:
             transform 0.2s ease,
-            background-color 0.2s ease;
+            background 0.2s ease;
     }
 
     .rotc-chatbot-input-area button:hover:not(:disabled) {
-        background: #325F38;
+        background: #285c31;
+
         transform: translateY(-1px);
     }
 
     .rotc-chatbot-input-area button:disabled {
         opacity: 0.45;
+
         cursor: not-allowed;
     }
 
 
     /* =========================================================
-    FLOATING CHAT BUTTON
+    FLOATING BUTTON
     ========================================================= */
 
     .rotc-chatbot-button {
         position: fixed;
 
-        right: 24px;
-        bottom: 24px;
+        right: 66px;
+        bottom: 45px;
 
-        width: 56px;
-        height: 56px;
+        width: 64px;
+        height: 64px;
 
         display: flex;
         align-items: center;
         justify-content: center;
 
-        padding: 0;
-
         border: none;
+
         border-radius: 50%;
 
-        background: #467646;
+        background: #34713d;
+
         color: #ffffff;
 
-        font-size: 24px;
+        font-size: 28px;
 
         cursor: pointer;
 
         box-shadow:
-            0 10px 28px rgba(0, 0, 0, 0.22);
+            0 8px 25px rgba(0, 0, 0, 0.25);
 
-        z-index: 100001;
+        z-index: 100000;
 
         transition:
             transform 0.2s ease,
-            background-color 0.2s ease;
+            background 0.2s ease;
     }
 
     .rotc-chatbot-button:hover {
-        background: #325F38;
+        background: #285c31;
+
         transform: translateY(-2px);
     }
 
@@ -4604,26 +4659,18 @@ rect:focus {
     TABLET
     ========================================================= */
 
-    @media (min-width: 641px) and (max-width: 1200px) {
+    @media (max-width: 1100px) {
 
         .rotc-chatbot-panel {
-            right: 20px;
-            bottom: 88px;
+            right: 30px;
 
-            width: min(
-                420px,
-                calc(100vw - 40px)
-            );
+            width: 430px;
 
-            height: min(
-                620px,
-                calc(100vh - 112px)
-            );
+            height: 640px;
         }
 
         .rotc-chatbot-button {
-            right: 20px;
-            bottom: 20px;
+            right: 30px;
         }
     }
 
@@ -4635,70 +4682,67 @@ rect:focus {
     @media (max-width: 640px) {
 
         .rotc-chatbot-panel {
-            right: 8px;
-            left: 8px;
-
-            bottom: 78px;
+            top: 20px;
+            right: 12px;
+            left: 12px;
 
             width: auto;
 
-            height: min(
-                72vh,
-                620px
-            );
+            height: calc(100vh - 40px);
 
-            min-height: 430px;
+            max-width: none;
+            max-height: none;
 
-            border-radius: 18px;
+            border-radius: 22px;
         }
 
         .rotc-chatbot-header {
-            min-height: 68px;
-            padding-left: 17px;
+            height: 72px;
+
+            padding: 0 18px;
         }
 
         .rotc-chatbot-title {
-            font-size: 16px;
+            font-size: 17px;
         }
 
         .rotc-chatbot-status {
-            font-size: 12px;
+            font-size: 13px;
         }
 
         .rotc-chatbot-messages {
-            padding: 14px;
+            padding: 20px 16px;
         }
 
         .rotc-chatbot-message {
-            max-width: 88%;
+            max-width: 82%;
+
             font-size: 14px;
         }
 
         .rotc-chatbot-input-area {
-            padding: 10px;
+            padding: 12px;
+        }
+
+        .rotc-chatbot-input-area textarea {
+            height: 50px;
+
+            padding: 14px 16px;
+        }
+
+        .rotc-chatbot-input-area button {
+            width: 50px;
+            height: 50px;
+
+            flex-basis: 50px;
         }
 
         .rotc-chatbot-button {
-            right: 14px;
-            bottom: 14px;
+            right: 18px;
+            bottom: 18px;
 
-            width: 54px;
-            height: 54px;
-
-            font-size: 22px;
-        }
-    }
-
-
-    /* =========================================================
-    SHORT MOBILE SCREENS
-    ========================================================= */
-
-    @media (max-width: 640px) and (max-height: 700px) {
-
-        .rotc-chatbot-panel {
-            height: calc(100vh - 94px);
-            min-height: 0;
+            width: 58px;
+            height: 58px;
         }
     }
     

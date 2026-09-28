@@ -13,7 +13,7 @@ class GeminiRotcChatbotService
             ->getAuthorizedContext($user);
 
         $apiKey = config('services.gemini.api_key');
-        $model = config('services.gemini.model', 'gemini-2.5-flash-lite');
+        $model = config('services.gemini.model', 'gemini-3.5-flash-lite');
 
         if (!$apiKey) {
             throw new RuntimeException('Gemini is not configured.');
@@ -33,43 +33,54 @@ Rules:
 - If the user asks about another person's private attendance or other private information that is not included in the authorized context, explain that you cannot provide it.
 PROMPT;
 
-        $response = Http::acceptJson()
-            ->timeout(30)
-            ->post(
-                'https://generativelanguage.googleapis.com/v1beta/models/'
-                . $model
-                . ':generateContent?key='
-                . urlencode($apiKey),
+        $payload = [
+            'system_instruction' => [
+                'parts' => [
+                    [
+                        'text' => $systemPrompt,
+                    ],
+                ],
+            ],
+            'contents' => [
                 [
-                    'system_instruction' => [
-                        'parts' => [
-                            [
-                                'text' => $systemPrompt,
-                            ],
-                        ],
-                    ],
-                    'contents' => [
+                    'role' => 'user',
+                    'parts' => [
                         [
-                            'role' => 'user',
-                            'parts' => [
-                                [
-                                    'text' => $message
-                                        . "\n\nAuthorized ROTC system data:\n"
-                                        . json_encode(
-                                            $context,
-                                            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
-                                        ),
-                                ],
-                            ],
+                            'text' => $message
+                                . "\n\nAuthorized ROTC system data:\n"
+                                . json_encode(
+                                    $context,
+                                    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+                                ),
                         ],
                     ],
-                ]
-            );
+                ],
+            ],
+        ];
 
-        if ($response->failed()) {
-            throw new RuntimeException(
-                'Gemini request failed: ' . $response->body()
-            );
+        $url = 'https://generativelanguage.googleapis.com/v1beta/models/'
+            . $model
+            . ':generateContent?key='
+            . urlencode($apiKey);
+
+        $response = null;
+
+        for ($attempt = 1; $attempt <= 3; $attempt++) {
+            $response = Http::acceptJson()
+                ->timeout(20)
+                ->post($url, $payload);
+
+            if ($response->successful()) {
+                break;
+            }
+
+            if ($response->status() !== 503 || $attempt === 3) {
+                throw new RuntimeException(
+                    'Gemini request failed: ' . $response->body()
+                );
+            }
+
+            sleep($attempt);
         }
 
         $data = $response->json();

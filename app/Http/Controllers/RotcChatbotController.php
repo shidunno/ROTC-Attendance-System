@@ -12,7 +12,7 @@ class RotcChatbotController extends Controller
 {
     public function __construct(
         private readonly RotcChatbotDataService $dataService,
-        private readonly OpenAiRotcChatbotService $chatbot
+        private readonly GeminiRotcChatbotService $chatbot
     ) {
     }
 

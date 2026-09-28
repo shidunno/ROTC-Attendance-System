@@ -74,8 +74,13 @@ PROMPT;
                 break;
             }
 
-            if ($response->status() === 503 && $attempt === 3) {
-                return "The ROTC Assistant is temporarily unavailable. Please try again in a few minutes.";
+            if ($response->status() === 503) {
+                if ($attempt === 3) {
+                    return "The ROTC Assistant is temporarily unavailable. Please try again in a few minutes.";
+                }
+
+                sleep($attempt);
+                continue;
             }
 
             if ($response->failed()) {

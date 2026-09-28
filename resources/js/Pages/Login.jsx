@@ -1,7 +1,6 @@
 import rotcLogo from '../assets/Gemini_Generated_Image_gx0nrrgx0nrrgx0n-removebg-preview.png'
 import {router} from '@inertiajs/react';
 import { useState } from 'react';
-import { getAuthContext } from '../authContext';
 
 export default function login() {
 
@@ -18,9 +17,6 @@ export default function login() {
         const password = e.target.password.value;
 
         router.post('/Login', {email, password}, { 
-            headers: {
-                'X-ROTC-Auth-Context': getAuthContext(),
-            },
             onError: (errors) => {
                 setLoginError(errors.email);
             },

@@ -23,77 +23,19 @@ Route::get('/', function () {
 
 Route::post('/Login', function(Request $request){
 
-    $request->validate([
+    $request->validate ([
         'email' => ['required', 'email'],
         'password' => ['required'],
     ]);
 
-    /*
-     * Each browser tab has its own authentication context.
-     * Do not use Auth::attempt() here because Laravel's normal
-     * session guard is shared by all tabs in the same browser profile.
-     */
-    $contextId = $request->header('X-ROTC-Auth-Context');
+    $credentials = [
+        'email' => $request->email,
+        'password' => $request->password
+    ];
 
-    if (
-        !is_string($contextId) ||
-        !preg_match('/^[a-f0-9-]{32,64}$/i', $contextId)
-    ) {
-        return back()->withErrors([
-            'email' => 'Authentication context is missing. Please refresh the page and try again.',
-        ]);
-    }
-
-    $user = \App\Models\User::where(
-        'email',
-        $request->email
-    )->first();
-
-    if (
-        $user &&
-        Hash::check(
-            $request->password,
-            $user->password
-        )
-    ) {
-        /*
-         * Get the authentication contexts already stored
-         * in this Laravel session.
-         */
-        $contexts = $request->session()->get(
-            'rotc_auth_contexts',
-            []
-        );
-
-        /*
-         * Only regenerate the session when this is the first
-         * authentication context in the session.
-         *
-         * If another tab is already logged in, regenerating
-         * the session would destroy the other tab's context.
-         */
-        if (empty($contexts)) {
-            $request->session()->regenerate();
-
-            $contexts = $request->session()->get(
-                'rotc_auth_contexts',
-                []
-            );
-        }
-
-        /*
-         * Associate this tab's context with this user.
-         */
-        $contexts[$contextId] = $user->id;
-
-        $request->session()->put(
-            'rotc_auth_contexts',
-            $contexts
-        );
-
-        return redirect(
-            '/Dashboard?tab=' . urlencode($contextId)
-        );
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+        return redirect('/Dashboard');
     }
 
     return back()->withErrors([
@@ -157,7 +99,6 @@ Route::post('/VerifyCode', function (Request $request) {
 
 
 Route::middleware('auth')->group(function() {   
-
 Route::get('/Dashboard', function() {
 
     $today = \Carbon\Carbon::today()->toDateString();
@@ -226,7 +167,6 @@ Route::get('/Dashboard', function() {
     Route::post('/api/rotc-chatbot/message', [RotcChatbotController::class, 'message'])
         ->name('rotc-chatbot.message');
 
-        
     // Announcement Routes
     Route::get('/Announcement', [AnnouncementController::class, 'index'])->name('announcement.index');
     Route::post('/Announcement', [AnnouncementController::class, 'store'])->name('announcement.store');
@@ -280,37 +220,10 @@ Route::get('/Dashboard', function() {
     Route::get('/my-attendance', [AttendanceController::class, 'myAttendance'])->name('attendance.my');
 
     Route::post('/Logout', function(Request $request) {
+        Auth::guard('web')->logout();
 
-        /*
-         * Remove only the current tab's authentication context.
-         * Do NOT invalidate the whole Laravel session because
-         * other tabs may still be logged in.
-         */
-        $contextId = $request->header('X-ROTC-Auth-Context');
-
-        $contexts = $request->session()->get(
-            'rotc_auth_contexts',
-            []
-        );
-
-        if (is_string($contextId)) {
-            unset($contexts[$contextId]);
-        }
-
-        $request->session()->put(
-            'rotc_auth_contexts',
-            $contexts
-        );
-
-        /*
-         * Do not call:
-         *
-         * $request->session()->invalidate();
-         *
-         * because that would log out every tab using
-         * this browser session.
-         */
-        Auth::forgetGuards();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return redirect('/');
     });

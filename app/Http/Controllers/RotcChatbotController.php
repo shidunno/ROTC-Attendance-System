@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\OpenAiRotcChatbotService;
+use App\Services\GeminiRotcChatbotService;
 use App\Services\RotcChatbotDataService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

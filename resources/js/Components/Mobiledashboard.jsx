@@ -116,7 +116,7 @@ export default function Mobiledashboard({ user }) {
 
                     <div
                         className="cadet-card"
-                        onClick={() => setCurrentView("chatbot")}
+                        onClick={() => window.dispatchEvent(new Event("open-rotc-chatbot"))}
                     >
                         <img src={Chatbotimg} alt="ChatBot" />
 

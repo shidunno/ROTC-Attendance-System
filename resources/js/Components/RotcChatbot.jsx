@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-export default function RotcChatbot({ onBack }) {
+export default function RotcChatbot() {
+    const [open, setOpen] = useState(false);
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([
         {
@@ -12,6 +13,19 @@ export default function RotcChatbot({ onBack }) {
     ]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+
+    useEffect(() => {
+        const openChatbot = () => setOpen(true);
+
+        window.addEventListener("open-rotc-chatbot", openChatbot);
+
+        return () => {
+            window.removeEventListener(
+                "open-rotc-chatbot",
+                openChatbot
+            );
+        };
+    }, []);
 
     const sendMessage = async (event) => {
         event?.preventDefault();
@@ -88,82 +102,98 @@ export default function RotcChatbot({ onBack }) {
     };
 
     return (
-        <div className="rotc-chatbot-page">
-            <div className="rotc-chatbot-panel">
-                <div className="rotc-chatbot-header">
-                    <button
-                        type="button"
-                        className="rotc-chatbot-back"
-                        onClick={onBack}
-                        aria-label="Back to dashboard"
-                    >
-                        ←
-                    </button>
+        <>
+            {open && (
+                <div className="rotc-chatbot-panel">
+                    <div className="rotc-chatbot-header">
+                        <div>
+                            <div className="rotc-chatbot-title">
+                                ROTC Assistant
+                            </div>
 
-                    <div>
-                        <div className="rotc-chatbot-title">
-                            ROTC Assistant
+                            <div className="rotc-chatbot-status">
+                                Support Assistant
+                            </div>
                         </div>
 
-                        <div className="rotc-chatbot-status">
-                            Support Assistant
-                        </div>
-                    </div>
-                </div>
-
-                <div className="rotc-chatbot-messages">
-                    {messages.map((item) => (
-                        <div
-                            key={item.id}
-                            className={`rotc-chatbot-message ${
-                                item.role === "user"
-                                    ? "rotc-chatbot-message-user"
-                                    : "rotc-chatbot-message-assistant"
-                            }`}
+                        <button
+                            type="button"
+                            className="rotc-chatbot-close"
+                            onClick={() => setOpen(false)}
+                            aria-label="Close ROTC Assistant"
                         >
-                            {item.content}
-                        </div>
-                    ))}
+                            ×
+                        </button>
+                    </div>
 
-                    {loading && (
-                        <div className="rotc-chatbot-message rotc-chatbot-message-assistant">
-                            Thinking...
-                        </div>
-                    )}
+                    <div className="rotc-chatbot-messages">
+                        {messages.map((item) => (
+                            <div
+                                key={item.id}
+                                className={`rotc-chatbot-message ${
+                                    item.role === "user"
+                                        ? "rotc-chatbot-message-user"
+                                        : "rotc-chatbot-message-assistant"
+                                }`}
+                            >
+                                {item.content}
+                            </div>
+                        ))}
 
-                    {error && (
-                        <div className="rotc-chatbot-error">
-                            {error}
-                        </div>
-                    )}
-                </div>
+                        {loading && (
+                            <div className="rotc-chatbot-message rotc-chatbot-message-assistant">
+                                Thinking...
+                            </div>
+                        )}
 
-                <form
-                    className="rotc-chatbot-input-area"
-                    onSubmit={sendMessage}
-                >
-                    <textarea
-                        value={message}
-                        onChange={(event) =>
-                            setMessage(event.target.value)
-                        }
-                        onKeyDown={handleKeyDown}
-                        placeholder="Type a message..."
-                        maxLength={2000}
-                        rows={1}
-                        disabled={loading}
-                        aria-label="Chat message"
-                    />
+                        {error && (
+                            <div className="rotc-chatbot-error">
+                                {error}
+                            </div>
+                        )}
+                    </div>
 
-                    <button
-                        type="submit"
-                        disabled={loading || !message.trim()}
-                        aria-label="Send message"
+                    <form
+                        className="rotc-chatbot-input-area"
+                        onSubmit={sendMessage}
                     >
-                        ➤
-                    </button>
-                </form>
-            </div>
-        </div>
+                        <textarea
+                            value={message}
+                            onChange={(event) =>
+                                setMessage(event.target.value)
+                            }
+                            onKeyDown={handleKeyDown}
+                            placeholder="Type a message..."
+                            maxLength={2000}
+                            rows={1}
+                            disabled={loading}
+                            aria-label="Chat message"
+                        />
+
+                        <button
+                            type="submit"
+                            disabled={loading || !message.trim()}
+                            aria-label="Send message"
+                        >
+                            ➤
+                        </button>
+                    </form>
+                </div>
+            )}
+
+            <button
+                type="button"
+                className="rotc-chatbot-button"
+                onClick={() => setOpen((current) => !current)}
+                aria-label={
+                    open
+                        ? "Close ROTC Assistant"
+                        : "Open ROTC Assistant"
+                }
+                aria-expanded={open}
+            >
+                <span aria-hidden="true">💬</span>
+            </button>
+        </>
     );
 }

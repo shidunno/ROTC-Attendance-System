@@ -10,6 +10,7 @@ import Chatbotimg from "../assets/chatbotimg.svg";
 import Settingimg from "../assets/settingimgdashboard.svg";
 
 import Qrdashboard from "./Qrdashboard";
+import RotcChatbot from "./RotcChatbot";
 
 export default function Mobiledashboard({ user }) {
     const [currentView, setCurrentView] = useState("dashboard");
@@ -20,6 +21,12 @@ export default function Mobiledashboard({ user }) {
                 user={user}
                 onBack={() => setCurrentView("dashboard")}
             />
+        );
+    }
+
+    if (currentView === "chatbot") {
+        return (
+            <RotcChatbot />
         );
     }
 
@@ -134,3 +141,7 @@ export default function Mobiledashboard({ user }) {
         </Layout>
     );
 }
+
+
+
+

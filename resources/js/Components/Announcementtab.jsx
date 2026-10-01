@@ -52,6 +52,7 @@ export default function Announcementtab({ user, announcement }) {
 
         post(`/announcements/${announcement.announcement_id}/comments`, {
             preserveScroll: true,
+            preserveState: true,
 
             onSuccess: () => {
                 reset();
@@ -71,6 +72,7 @@ export default function Announcementtab({ user, announcement }) {
         return (
             <div className='commentcontainer'>
                 <img src={Commentimg} alt="comment" />
+
                 <button
                     type="button"
                     onClick={() => setVisible(false)}
@@ -100,7 +102,10 @@ export default function Announcementtab({ user, announcement }) {
                     width: '100%'
                 }}
             >
-                <img src={Announcementprofileimg} alt="profile" />
+                <img
+                    src={Announcementprofileimg}
+                    alt="profile"
+                />
 
                 <input
                     type='text'
@@ -115,7 +120,10 @@ export default function Announcementtab({ user, announcement }) {
                 <button
                     type="button"
                     onClick={handleCommentSubmit}
-                    disabled={processing || !data.content.trim()}
+                    disabled={
+                        processing ||
+                        !data.content.trim()
+                    }
                     style={{
                         background: '#325F38',
                         color: '#fff',
@@ -123,12 +131,16 @@ export default function Announcementtab({ user, announcement }) {
                         borderRadius: '6px',
                         padding: '8px 14px',
                         fontWeight: 'bold',
-                        cursor: processing || !data.content.trim()
-                            ? 'not-allowed'
-                            : 'pointer',
-                        opacity: processing || !data.content.trim()
-                            ? 0.6
-                            : 1,
+                        cursor:
+                            processing ||
+                            !data.content.trim()
+                                ? 'not-allowed'
+                                : 'pointer',
+                        opacity:
+                            processing ||
+                            !data.content.trim()
+                                ? 0.6
+                                : 1,
                         whiteSpace: 'nowrap'
                     }}
                 >
@@ -155,20 +167,30 @@ export default function Announcementtab({ user, announcement }) {
                 id="announcementtab"
                 className="defcontainer"
                 style={{
-                    backgroundColor: announcement?.is_pinned ? '#E8F3EA' : ''
+                    backgroundColor: announcement?.is_pinned
+                        ? '#E8F3EA'
+                        : ''
                 }}
             >
                 <div id='Amaincont'>
+
                     <div id='Ainnercont1'>
-                        <img src={Announcementprofileimg} alt="profile" />
+                        <img
+                            src={Announcementprofileimg}
+                            alt="profile"
+                        />
 
                         <div id='Ainnercont2'>
                             <h1>{authorName}</h1>
-                            <p>{authorRole} │ {postDate}</p>
+
+                            <p>
+                                {authorRole} │ {postDate}
+                            </p>
                         </div>
                     </div>
 
                     <div id='Ainnercont3'>
+
                         {user?.role === 'admin' && (
                             <>
                                 <img
@@ -179,14 +201,22 @@ export default function Announcementtab({ user, announcement }) {
                                             `/announcements/${announcement.announcement_id}/pin`
                                         );
                                     }}
-                                    style={{ cursor: 'pointer' }}
+                                    style={{
+                                        cursor: 'pointer'
+                                    }}
                                 />
 
                                 <img
                                     src={Dotimg}
-                                    onClick={() => setShowDropdown(!showDropdown)}
+                                    onClick={() =>
+                                        setShowDropdown(
+                                            !showDropdown
+                                        )
+                                    }
                                     alt="options"
-                                    style={{ cursor: 'pointer' }}
+                                    style={{
+                                        cursor: 'pointer'
+                                    }}
                                 />
 
                                 {showDropdown && (
@@ -197,6 +227,7 @@ export default function Announcementtab({ user, announcement }) {
                                                 href="#"
                                                 onClick={(e) => {
                                                     e.preventDefault();
+
                                                     setIsEditMode(true);
                                                     setIsModalOpen(true);
                                                     setShowDropdown(false);
@@ -231,6 +262,7 @@ export default function Announcementtab({ user, announcement }) {
                                 )}
                             </>
                         )}
+
                     </div>
                 </div>
 
@@ -278,7 +310,9 @@ export default function Announcementtab({ user, announcement }) {
                                 gap: '6px'
                             }}
                         >
-                            {getFileName(attachments.document)}
+                            {getFileName(
+                                attachments.document
+                            )}
                         </a>
                     </div>
                 )}
@@ -289,7 +323,9 @@ export default function Announcementtab({ user, announcement }) {
 
                     <button
                         type="button"
-                        onClick={() => setIsModalOpen(true)}
+                        onClick={() =>
+                            setIsModalOpen(true)
+                        }
                         className='commentcontainer1'
                         style={{
                             background: 'none',
@@ -298,31 +334,125 @@ export default function Announcementtab({ user, announcement }) {
                             padding: 0
                         }}
                     >
-                        <img src={Fullpostimg} alt="view post" />
+                        <img
+                            src={Fullpostimg}
+                            alt="view post"
+                        />
+
                         <span>View Post</span>
                     </button>
 
                 </div>
+
+                {/* Display saved comments */}
+                {announcement?.comments?.length > 0 && (
+                    <div
+                        style={{
+                            marginTop: '12px',
+                            width: '100%'
+                        }}
+                    >
+                        {announcement.comments.map(
+                            (comment) => (
+                                <div
+                                    key={comment.id}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'flex-start',
+                                        gap: '10px',
+                                        marginBottom: '12px'
+                                    }}
+                                >
+                                    <img
+                                        src={
+                                            Announcementprofileimg
+                                        }
+                                        alt="profile"
+                                        style={{
+                                            width: '32px',
+                                            height: '32px',
+                                            borderRadius: '50%'
+                                        }}
+                                    />
+
+                                    <div
+                                        style={{
+                                            flex: 1,
+                                            minWidth: 0
+                                        }}
+                                    >
+                                        <div
+                                            style={{
+                                                fontWeight: 'bold',
+                                                color: '#325F38'
+                                            }}
+                                        >
+                                            {comment.user?.name ||
+                                                'Unknown User'}
+                                        </div>
+
+                                        <div
+                                            style={{
+                                                marginTop: '3px',
+                                                whiteSpace: 'pre-wrap',
+                                                overflowWrap: 'anywhere'
+                                            }}
+                                        >
+                                            {comment.content}
+                                        </div>
+
+                                        {comment.created_at && (
+                                            <div
+                                                style={{
+                                                    marginTop: '3px',
+                                                    fontSize: '12px',
+                                                    color: '#777'
+                                                }}
+                                            >
+                                                {new Date(
+                                                    comment.created_at
+                                                ).toLocaleString()}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )
+                        )}
+                    </div>
+                )}
+
             </div>
 
             <Announcementmodal
                 isOpen={isModalOpen}
+
                 onClose={() => {
                     setIsModalOpen(false);
                     setIsEditMode(false);
                 }}
+
                 isEditMode={isEditMode}
+
                 announcement={{
-                    announcement_id: announcement?.announcement_id,
+                    announcement_id:
+                        announcement?.announcement_id,
+
                     authorName,
+
                     role: authorRole,
+
                     date: postDate,
+
                     title:
-                        announcement?.title !== 'General Announcement'
+                        announcement?.title !==
+                        'General Announcement'
                             ? announcement?.title
                             : null,
+
                     content: postContent,
+
                     imagePath,
+
                     documentPath
                 }}
             />

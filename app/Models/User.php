@@ -45,4 +45,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(Platoon::class, 'leader_id');
     }
+
+    // Relationship: User has many announcement comments
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
 }

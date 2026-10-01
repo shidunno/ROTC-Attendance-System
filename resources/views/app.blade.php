@@ -7,7 +7,7 @@
     @viteReactRefresh
     @vite('resources/js/App.jsx')
     @inertiaHead
-    <title>Document</title>
+    <title>ROTC Attendance Management System</title>
 </head>
 <body>
     @inertia

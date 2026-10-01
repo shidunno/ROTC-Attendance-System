@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Announcement;
+use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -11,10 +12,10 @@ class AnnouncementController extends Controller
 {
     public function index()
     {
-        $announcements = Announcement::with('user')
-        ->orderBy('is_pinned', 'desc')
-        ->orderBy('posted_at', 'desc')
-        ->get()
+        $announcements = Announcement::with(['user', 'comments.user'])
+            ->orderBy('is_pinned', 'desc')
+            ->orderBy('posted_at', 'desc')
+            ->get()
             ->map(function ($announcement) {
                 return [
                     'announcement_id' => $announcement->announcement_id,
@@ -23,12 +24,39 @@ class AnnouncementController extends Controller
                     'attachments'     => $announcement->attachments,
                     'is_pinned'       => $announcement->is_pinned,
                     'posted_at'       => $announcement->posted_at,
-                    'user'            => [
+
+                    'comments' => $announcement->comments->map(function ($comment) {
+                        return [
+                            'id'         => $comment->id,
+                            'content'    => $comment->content,
+                            'created_at' => $comment->created_at,
+                            'user'       => [
+                                'id'        => $comment->user?->id,
+                                'custom_id' => $comment->user?->custom_id
+                                    ?? $comment->user?->name
+                                    ?? 'Unknown',
+                                'name'      => $comment->user?->name
+                                    ?? 'Unknown User',
+                                'role'      => $comment->user?->role
+                                    ?? 'cadet',
+                            ],
+                        ];
+                    })->values(),
+
+                    'user' => [
                         'id'        => $announcement->user?->id,
-                        // Primary label will use custom_id, falling back to name
-                        'custom_id' => $announcement->user?->custom_id ?? $announcement->user?->name ?? 'Unknown',
-                        'name'      => $announcement->user?->name ?? 'Unknown User',
-                        'role'      => $announcement->user?->role ?? 'cadet',
+
+                        // Primary label will use custom_id,
+                        // falling back to name
+                        'custom_id' => $announcement->user?->custom_id
+                            ?? $announcement->user?->name
+                            ?? 'Unknown',
+
+                        'name' => $announcement->user?->name
+                            ?? 'Unknown User',
+
+                        'role' => $announcement->user?->role
+                            ?? 'cadet',
                     ],
                 ];
             });
@@ -52,32 +80,67 @@ class AnnouncementController extends Controller
         $filePaths = [];
 
         if ($request->hasFile('image')) {
-            $filePaths['image'] = $request->file('image')->store('announcements/images', 'public');
+            $filePaths['image'] = $request->file('image')
+                ->store('announcements/images', 'public');
         }
 
         if ($request->hasFile('attachment')) {
-            $filePaths['document'] = $request->file('attachment')->store('announcements/attachments', 'public');
+            $filePaths['document'] = $request->file('attachment')
+                ->store('announcements/attachments', 'public');
         }
 
         Announcement::create([
-            'posted_by'    => auth()->id(), // Links to users.id foreign key
+            'posted_by'    => auth()->id(),
             'title'        => $validated['title'] ?? 'General Announcement',
             'content'      => $validated['content'],
             'attachments'  => !empty($filePaths) ? $filePaths : null,
             'scheduled_at' => $validated['scheduled_at'] ?? null,
         ]);
 
-        return back()->with('success', 'Announcement posted successfully!');
+        return back()->with(
+            'success',
+            'Announcement posted successfully!'
+        );
+    }
+
+    /**
+     * Store a comment for an announcement.
+     */
+    public function comment(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'content' => [
+                'required',
+                'string',
+                'max:5000',
+            ],
+        ]);
+
+        $announcement = Announcement::findOrFail($id);
+
+        Comment::create([
+            'announcement_id' => $announcement->announcement_id,
+            'user_id'         => auth()->id(),
+            'content'         => trim($validated['content']),
+        ]);
+
+        return back()->with('success', 'Comment posted successfully.');
     }
 
     public function destroy($id)
     {
-        $announcement = Announcement::where('announcement_id', $id)->firstOrFail();
+        $announcement = Announcement::where(
+            'announcement_id',
+            $id
+        )->firstOrFail();
 
         $announcement->delete();
 
         return redirect()->route('announcement.index')
-            ->with('success', 'Announcement deleted successfully.');
+            ->with(
+                'success',
+                'Announcement deleted successfully.'
+            );
     }
 
     public function update(Request $request, $id)
@@ -96,7 +159,10 @@ class AnnouncementController extends Controller
         ]);
 
         return redirect()->route('announcement.index')
-            ->with('success', 'Announcement updated successfully.');
+            ->with(
+                'success',
+                'Announcement updated successfully.'
+            );
     }
 
     public function togglePin($id)
@@ -107,6 +173,9 @@ class AnnouncementController extends Controller
             'is_pinned' => !$announcement->is_pinned,
         ]);
 
-        return back()->with('success', 'Announcement pin status updated.');
+        return back()->with(
+            'success',
+            'Announcement pin status updated.'
+        );
     }
 }

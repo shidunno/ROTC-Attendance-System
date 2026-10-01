@@ -37,4 +37,16 @@ class Announcement extends Model
     {
         return $this->belongsTo(User::class, 'posted_by');
     }
+
+    /**
+     * Relationship to announcement comments.
+     */
+    public function comments()
+    {
+        return $this->hasMany(
+            Comment::class,
+            'announcement_id',
+            'announcement_id'
+        )->with('user')->latest();
+    }
 }

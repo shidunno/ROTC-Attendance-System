@@ -5,11 +5,11 @@ import Announcementtab from "@/Components/Announcementtab";
 export default function Announcement({ user, announcements = [] }) {
     const renderList = () => (
         announcements.length > 0 ? (
-            announcements.map((announcement, index) => (
-                <Announcementtab 
-                    key={announcement.id || index} 
-                    user={user} 
-                    announcement={announcement} 
+            announcements.map((announcement) => (
+                <Announcementtab
+                    key={announcement.announcement_id}
+                    user={user}
+                    announcement={announcement}
                 />
             ))
         ) : (
@@ -21,7 +21,7 @@ export default function Announcement({ user, announcements = [] }) {
         return (
             <Layout pageTitle='Announcement'>
                 <div className="createannouncementcontainer">
-                    <Createannouncement /> 
+                    <Createannouncement />
                     {renderList()}
                 </div>
             </Layout>
@@ -37,4 +37,6 @@ export default function Announcement({ user, announcements = [] }) {
             </Layout>
         );
     }
+
+    return null;
 }

@@ -175,6 +175,9 @@ Route::get('/Dashboard', function() {
     Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update']);
     Route::put('/announcements/{announcement}/pin', [AnnouncementController::class, 'togglePin']);
 
+    Route::post('/announcements/{announcement}/comments',[AnnouncementController::class, 'comment'])
+    ->name('announcement.comments.store');
+
     Route::get('/Student', [UserController::class, 'index']);
     Route::get('/student', [UserController::class, 'index'])->name('cadets.index');
 

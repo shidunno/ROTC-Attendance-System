@@ -1,6 +1,6 @@
 import {Link, router, usePage} from "@inertiajs/react";
 import {useState} from "react";
-import Userprofileimg from '../assets/ROTC_logo.svg';
+import Userprofileimg from "../assets/userprofileimg.svg";
 import Dashboardimg from '../assets/dashboardimg.svg'
 import Announcementimg from '../assets/announcementsidebarimg.svg'
 import Studentimg from '../assets/studentimg.svg'
@@ -30,7 +30,7 @@ export default function Sidebar() {
         return (
             <div id = 'sidebarlink' className={`sidebar ${loading ? 'pointer-events-none opacity-50' : ''}`}>
                 <ul style={{ listStyleType: 'none', padding: 0, display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
-                    <img src={ROTC_logo} alt="User Profile" />
+                    <img src={Userprofileimg} alt="User Profile" />
                     <h1 style={{ color: 'white', fontSize: '2vw', textAlign: 'center' }}>ROTC Attendance System</h1>
                     <li><Link href="/Dashboard" onClick={(e) => handleClick(e, "/Dashboard")}><img src={Dashboardimg}></img><p>Dashboard</p></Link></li>
                     <li><Link href="/Announcement" onClick={(e) => handleClick(e, "/Announcement")}><img src={Announcementimg}></img><p>Announcement</p></Link></li>
@@ -46,7 +46,7 @@ export default function Sidebar() {
         return (
              <div id = 'sidebarlink' className={`sidebar ${loading ? 'pointer-events-none opacity-50' : ''}`}>
                 <ul style={{ listStyleType: 'none', padding: 0, display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
-                    <img src={ROTC_logo} alt="User Profile" />
+                    <img src={Userprofileimg} alt="User Profile" />
                     <h1 style={{ color: 'white', fontSize: '2vw', textAlign: 'center' }}>ROTC Attendance System</h1>
                     <li><Link href="/Dashboard" onClick={(e) => handleClick(e, "/Dashboard")}><img src={Dashboardimg}></img><p>Dashboard</p></Link></li>
                     <li><Link href="/Announcement" onClick={(e) => handleClick(e, "/Announcement")}><img src={Announcementimg}></img><p>Announcement</p></Link></li>

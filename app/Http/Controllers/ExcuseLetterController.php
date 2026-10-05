@@ -39,7 +39,7 @@ class ExcuseLetterController extends Controller
     {
         $request->validate([
             'date' => 'required|date',
-            'file' => 'required|file|mimes:pdf,jpg,png|max:2048',
+            'file' => 'required|file|mimes:pdf,jpg,png,doc,docx|max:10240',
         ]);
 
         // Store file in storage/app/public/excuse_letters

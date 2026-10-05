@@ -1,6 +1,6 @@
 import {Link, router, usePage} from "@inertiajs/react";
 import {useState} from "react";
-import Userprofileimg from "../assets/userprofileimg.svg";
+import ROTC_logo from "../assets/ROTC_logo.svg";
 import Dashboardimg from '../assets/dashboardimg.svg'
 import Announcementimg from '../assets/announcementsidebarimg.svg'
 import Studentimg from '../assets/studentimg.svg'

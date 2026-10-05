@@ -4,13 +4,11 @@ import Arrowimg from '../assets/arrowimg.svg';
 import Lockimg from '../assets/lockimg.svg';
 import Systemimg from '../assets/systemimg.svg';
 import Attendanceimg from '../assets/attendanceimg.svg';
-import Statusimg from '../assets/statusimg.svg';
 
 import Profileinformation from "@/Components/Profileinformation";
 import Changepassword from "@/Components/Changepassword";
 import Systeminformation from "@/Components/Systeminformation";
 import Attendancerules from "@/Components/Attendancerules";
-import Attendancestatus from "@/Components/Attendancestatus";
 
 import { useState } from 'react';
 
@@ -19,14 +17,12 @@ export default function Setting({ systemSettings, auth }) {
     const [showChangePassword, setShowChangePassword] = useState(false);
     const [showSysteminformation, setShowSysteminformation] = useState(false);
     const [showAttendancerules, setShowAttendancerules] = useState(false);
-    const [showAttendancestatus, setShowAttendancestatus] = useState(false);
 
     const handleBack = () => {
         setShowProfile(false);
         setShowChangePassword(false);
         setShowSysteminformation(false);
         setShowAttendancerules(false);
-        setShowAttendancestatus(false);
     };
 
     const getPageTitle = () => {
@@ -34,7 +30,6 @@ export default function Setting({ systemSettings, auth }) {
         if (showChangePassword) return 'Change Password';
         if (showSysteminformation) return 'System Information';
         if (showAttendancerules) return 'Attendance Rules';
-        if (showAttendancestatus) return 'Attendance Status';
 
         return 'Setting';
     };
@@ -66,12 +61,6 @@ export default function Setting({ systemSettings, auth }) {
             ) : showAttendancerules ? (
 
                 <Attendancerules
-                    onBack={handleBack}
-                />
-
-            ) : showAttendancestatus ? (
-
-                <Attendancestatus
                     onBack={handleBack}
                 />
 
@@ -198,32 +187,6 @@ export default function Setting({ systemSettings, auth }) {
                                 <img
                                     src={Arrowimg}
                                     onClick={() => setShowAttendancerules(true)}
-                                    style={{ cursor: 'pointer' }}
-                                    alt="Navigate"
-                                />
-                            </div>
-
-                            <div className="settinginnercontainer">
-                                <div className="settingmaincontainer">
-                                    <img
-                                        src={Statusimg}
-                                        alt="Status Icon"
-                                    />
-
-                                    <div className="settingerinnercontainer1">
-                                        <h1 id="h1s">
-                                            Attendance Status
-                                        </h1>
-
-                                        <p id="h2s">
-                                            Manage available attendance statuses
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <img
-                                    src={Arrowimg}
-                                    onClick={() => setShowAttendancestatus(true)}
                                     style={{ cursor: 'pointer' }}
                                     alt="Navigate"
                                 />

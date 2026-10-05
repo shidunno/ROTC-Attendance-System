@@ -14,7 +14,7 @@ import Attendancestatus from "@/Components/Attendancestatus";
 
 import { useState } from 'react';
 
-export default function Setting({ systemSettings }) {
+export default function Setting({ systemSettings, auth }) {
     const [showProfile, setShowProfile] = useState(false);
     const [showChangePassword, setShowChangePassword] = useState(false);
     const [showSysteminformation, setShowSysteminformation] = useState(false);
@@ -38,6 +38,8 @@ export default function Setting({ systemSettings }) {
 
         return 'Setting';
     };
+
+    const isAdmin = auth?.user?.role === 'admin';
 
     return (
         <Layout pageTitle={getPageTitle()}>
@@ -135,95 +137,99 @@ export default function Setting({ systemSettings }) {
                         </div>
                     </div>
 
-                    {/* System Settings */}
-                    <div className="settingcontainer1">
-                        <h1>System Settings</h1>
-                        <p>Manage general system information</p>
+                    {/* System Settings - Admin only */}
+                    {isAdmin && (
+                        <div className="settingcontainer1">
+                            <h1>System Settings</h1>
+                            <p>Manage general system information</p>
 
-                        <div className="settinginnercontainer">
-                            <div className="settingmaincontainer">
-                                <img
-                                    src={Systemimg}
-                                    alt="System Icon"
-                                />
+                            <div className="settinginnercontainer">
+                                <div className="settingmaincontainer">
+                                    <img
+                                        src={Systemimg}
+                                        alt="System Icon"
+                                    />
 
-                                <div className="settingerinnercontainer1">
-                                    <h1 id="h1s">
-                                        System Information
-                                    </h1>
+                                    <div className="settingerinnercontainer1">
+                                        <h1 id="h1s">
+                                            System Information
+                                        </h1>
 
-                                    <p id="h2s">
-                                        Manage system and information details
-                                    </p>
+                                        <p id="h2s">
+                                            Manage system and information details
+                                        </p>
+                                    </div>
                                 </div>
+
+                                <img
+                                    src={Arrowimg}
+                                    onClick={() => setShowSysteminformation(true)}
+                                    style={{ cursor: 'pointer' }}
+                                    alt="Navigate"
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Attendance Settings - Admin only */}
+                    {isAdmin && (
+                        <div className="settingcontainer1">
+                            <h1>Attendance Settings</h1>
+                            <p>Manage attendance preferences</p>
+
+                            <div className="settinginnercontainer">
+                                <div className="settingmaincontainer">
+                                    <img
+                                        src={Attendanceimg}
+                                        alt="Attendance Icon"
+                                    />
+
+                                    <div className="settingerinnercontainer1">
+                                        <h1 id="h1s">
+                                            Attendance Rules
+                                        </h1>
+
+                                        <p id="h2s">
+                                            Manage time-in, time-out, and late rules
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <img
+                                    src={Arrowimg}
+                                    onClick={() => setShowAttendancerules(true)}
+                                    style={{ cursor: 'pointer' }}
+                                    alt="Navigate"
+                                />
                             </div>
 
-                            <img
-                                src={Arrowimg}
-                                onClick={() => setShowSysteminformation(true)}
-                                style={{ cursor: 'pointer' }}
-                                alt="Navigate"
-                            />
-                        </div>
-                    </div>
+                            <div className="settinginnercontainer">
+                                <div className="settingmaincontainer">
+                                    <img
+                                        src={Statusimg}
+                                        alt="Status Icon"
+                                    />
 
-                    {/* Attendance Settings */}
-                    <div className="settingcontainer1">
-                        <h1>Attendance Settings</h1>
-                        <p>Manage attendance preferences</p>
+                                    <div className="settingerinnercontainer1">
+                                        <h1 id="h1s">
+                                            Attendance Status
+                                        </h1>
 
-                        <div className="settinginnercontainer">
-                            <div className="settingmaincontainer">
-                                <img
-                                    src={Attendanceimg}
-                                    alt="Attendance Icon"
-                                />
-
-                                <div className="settingerinnercontainer1">
-                                    <h1 id="h1s">
-                                        Attendance Rules
-                                    </h1>
-
-                                    <p id="h2s">
-                                        Manage time-in, time-out, and late rules
-                                    </p>
+                                        <p id="h2s">
+                                            Manage available attendance statuses
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <img
-                                src={Arrowimg}
-                                onClick={() => setShowAttendancerules(true)}
-                                style={{ cursor: 'pointer' }}
-                                alt="Navigate"
-                            />
-                        </div>
-
-                        <div className="settinginnercontainer">
-                            <div className="settingmaincontainer">
                                 <img
-                                    src={Statusimg}
-                                    alt="Status Icon"
+                                    src={Arrowimg}
+                                    onClick={() => setShowAttendancestatus(true)}
+                                    style={{ cursor: 'pointer' }}
+                                    alt="Navigate"
                                 />
-
-                                <div className="settingerinnercontainer1">
-                                    <h1 id="h1s">
-                                        Attendance Status
-                                    </h1>
-
-                                    <p id="h2s">
-                                        Manage available attendance statuses
-                                    </p>
-                                </div>
                             </div>
-
-                            <img
-                                src={Arrowimg}
-                                onClick={() => setShowAttendancestatus(true)}
-                                style={{ cursor: 'pointer' }}
-                                alt="Navigate"
-                            />
                         </div>
-                    </div>
+                    )}
 
                 </div>
             )}

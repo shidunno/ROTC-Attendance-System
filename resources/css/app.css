@@ -1,3 +1,7 @@
+@import "./rotc-chatbot.css";
+
+
+
 html, body {
     margin: 0;
     padding: 0;
@@ -4010,8 +4014,7 @@ rect:focus {
         margin-top: 3vh;
     }
 
-   @import "./rotc-chatbot.css";
-
+   
 }
 
 

@@ -4013,7 +4013,25 @@ rect:focus {
     /* =========================================================
    ROTC ASSISTANT CHATBOT
    ========================================================= */
-.rotc-chatbot-panel {
+
+    .rotc-chatbot-overlay {
+        position: fixed;
+
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background: rgba(0, 0, 0, 0.35);
+
+        z-index: 9997;
+    }
+
+    .rotc-chatbot-panel {
         position: fixed;
 
         right: 24px;
@@ -4213,7 +4231,7 @@ rect:focus {
     /* Mobile */
 
     @media (max-width: 640px) {
-.rotc-chatbot-panel {
+        .rotc-chatbot-panel {
             right: 8px;
             bottom: 78px;
 

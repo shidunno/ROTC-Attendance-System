@@ -592,6 +592,14 @@ export default function Usertable({
                                 >
                                     Cancel
                                 </button>
+
+                                <button
+                                    type="submit"
+                                    className="edit-user-btn-save"
+                                    disabled={!selectedPlatoonId}
+                                >
+                                    Confirm
+                                </button>
                             </div>
                         </form>
                     </div>
